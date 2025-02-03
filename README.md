@@ -10,3 +10,15 @@ This repo will host code for manim animations that visualize how Fenwick Trees w
 # Code
 ...
 
+# Setting up conda environment
+The `environment.yml` file defines the conda environment that can be used to run and develop on the project.
+
+Create the environment:
+```
+$ conda env create -f environment.yml
+```
+
+Activate environment:
+```
+$ conda activate fenwick_manim
+```
