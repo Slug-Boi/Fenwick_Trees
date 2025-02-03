@@ -5,7 +5,7 @@ channels:
 dependencies:
   - python=3.12
   - pip
-  - manim
+  - manim=0.18.1
   - pip:
     - manim-dsa
 
