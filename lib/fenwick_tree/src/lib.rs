@@ -44,6 +44,14 @@ impl FenwickTree {
         }
     }
 
+    fn get_size(&self) -> i32 {
+        self.size
+    }
+
+    fn get_tree(&self) -> Vec<i32> {
+        self.tree.clone()
+    }
+
     // This function behaves more like what you would expect from an update function where it overides the value at index
     // And then propagates the change up the tree. NOTE: Be careful as this may result in negative values in the tree
     // so please exercise caution when using this

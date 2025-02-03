@@ -11,3 +11,5 @@ print(fenwick_tree.sum(4))
 
 fenwick_tree.override_update(2, 10)
 print(fenwick_tree.sum(3))
+
+print(fenwick_tree.get_tree())
