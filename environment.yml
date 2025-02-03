@@ -1,0 +1,9 @@
+name: fenwick_manim
+channels:
+  - conda-forge
+
+dependencies:
+  - manim
+  - pip:
+    - manim-dsa
+
