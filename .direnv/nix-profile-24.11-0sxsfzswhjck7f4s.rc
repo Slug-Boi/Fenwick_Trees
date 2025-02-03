@@ -45,7 +45,7 @@ NIX_CC='/nix/store/700a0ayy1s1h7zg9dqiqy0xvmhfr26l6-clang-wrapper-16.0.6'
 export NIX_CC
 NIX_CC_WRAPPER_TARGET_HOST_aarch64_apple_darwin='1'
 export NIX_CC_WRAPPER_TARGET_HOST_aarch64_apple_darwin
-NIX_CFLAGS_COMPILE=' -frandom-seed=c60rbxdrx1 -isystem /nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/include -isystem /nix/store/m0cya4abxw5nlrc7x2m8s0jypny7x36j-libcxx-16.0.6-dev/include -isystem /nix/store/w6agvr7fbc0090qmgjqzppgyskqrjr6w-compiler-rt-libc-16.0.6-dev/include -isystem /nix/store/8fr60sg82dqy3pvh03wpl63wzcnkaa79-libiconv-107-dev/include -isystem /nix/store/kqzdzql05x9sh97dvdpcibqii2jd0mza-libresolv-83-dev/include -isystem /nix/store/zk9mr46qk2la691z6mnkb1q412ccxqyj-libsbuf-14.1.0-dev/include -isystem /nix/store/2wfsrqifxrf2qc81wsgvnn412v4c23r3-cups-headers-2.4.11/include -isystem /nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/include -isystem /nix/store/m0cya4abxw5nlrc7x2m8s0jypny7x36j-libcxx-16.0.6-dev/include -isystem /nix/store/w6agvr7fbc0090qmgjqzppgyskqrjr6w-compiler-rt-libc-16.0.6-dev/include -isystem /nix/store/8fr60sg82dqy3pvh03wpl63wzcnkaa79-libiconv-107-dev/include -isystem /nix/store/kqzdzql05x9sh97dvdpcibqii2jd0mza-libresolv-83-dev/include -isystem /nix/store/zk9mr46qk2la691z6mnkb1q412ccxqyj-libsbuf-14.1.0-dev/include -isystem /nix/store/2wfsrqifxrf2qc81wsgvnn412v4c23r3-cups-headers-2.4.11/include'
+NIX_CFLAGS_COMPILE=' -frandom-seed=pd3hlxwhy9 -isystem /nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/include -isystem /nix/store/m0cya4abxw5nlrc7x2m8s0jypny7x36j-libcxx-16.0.6-dev/include -isystem /nix/store/w6agvr7fbc0090qmgjqzppgyskqrjr6w-compiler-rt-libc-16.0.6-dev/include -isystem /nix/store/8fr60sg82dqy3pvh03wpl63wzcnkaa79-libiconv-107-dev/include -isystem /nix/store/kqzdzql05x9sh97dvdpcibqii2jd0mza-libresolv-83-dev/include -isystem /nix/store/zk9mr46qk2la691z6mnkb1q412ccxqyj-libsbuf-14.1.0-dev/include -isystem /nix/store/2wfsrqifxrf2qc81wsgvnn412v4c23r3-cups-headers-2.4.11/include -isystem /nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/include -isystem /nix/store/m0cya4abxw5nlrc7x2m8s0jypny7x36j-libcxx-16.0.6-dev/include -isystem /nix/store/w6agvr7fbc0090qmgjqzppgyskqrjr6w-compiler-rt-libc-16.0.6-dev/include -isystem /nix/store/8fr60sg82dqy3pvh03wpl63wzcnkaa79-libiconv-107-dev/include -isystem /nix/store/kqzdzql05x9sh97dvdpcibqii2jd0mza-libresolv-83-dev/include -isystem /nix/store/zk9mr46qk2la691z6mnkb1q412ccxqyj-libsbuf-14.1.0-dev/include -isystem /nix/store/2wfsrqifxrf2qc81wsgvnn412v4c23r3-cups-headers-2.4.11/include'
 export NIX_CFLAGS_COMPILE
 NIX_DONT_SET_RPATH='1'
 export NIX_DONT_SET_RPATH
@@ -75,7 +75,7 @@ OLDPWD=''
 export OLDPWD
 OPTERR='1'
 OSTYPE='darwin24.0.0'
-PATH='/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/bin:/nix/store/fx9c8g2f77q8rmvlrqwmmfhxajky9s2h-python3.12-poetry-1.8.4/bin:/nix/store/700a0ayy1s1h7zg9dqiqy0xvmhfr26l6-clang-wrapper-16.0.6/bin:/nix/store/r0w268903vjlq1vrnajb3lvll4hs5z8g-clang-16.0.6/bin:/nix/store/4axvrmlyszz77x66am0damj6pz4jh683-coreutils-9.5/bin:/nix/store/vnkvxq7wqxg180awsv2rmira5pvc875p-cctools-binutils-darwin-wrapper-1010.6/bin:/nix/store/wli7d4k9sh4c6fwarw3afc5g5axwbjm8-cctools-binutils-darwin-1010.6/bin:/nix/store/p2m1yki058ajw7rfcs1gmvhz3mlpjv9b-xcbuild-0.1.1-unstable-2019-11-20-xcrun/bin:/nix/store/dvmq3xa54hfik85259wyf281m076s14h-libiconv-107/bin:/nix/store/4axvrmlyszz77x66am0damj6pz4jh683-coreutils-9.5/bin:/nix/store/pk36s5bggzr8nwb9pisp4yy3r5nk8099-findutils-4.10.0/bin:/nix/store/jaax21mi17ijk3dxx5mn7ralw9sgv4xv-diffutils-3.10/bin:/nix/store/r0sjy6i8dmm0snm63hc5i4a7nijw1pw5-gnused-4.9/bin:/nix/store/fay4393fknlsn89l6ifzk4m3pfwbxk0a-gnugrep-3.11/bin:/nix/store/pd5r50d0yjbk5542kii9mj1rvs4fp3rv-gawk-5.3.1/bin:/nix/store/kmil8v4r168frg56f9aync1j4j8lvcr3-gnutar-1.35/bin:/nix/store/203vr06z8isiffinykb2v1asij8pka54-gzip-1.13/bin:/nix/store/bsbh4173ym99hv0nad74ygz869pvnkby-bzip2-1.0.8-bin/bin:/nix/store/jr9m0plz39q5nml33h1n2nyv6qrn8vrw-gnumake-4.4.1/bin:/nix/store/rj7zvmif800bgg3sbznq6g5g438jx104-bash-5.2p37/bin:/nix/store/rcn2sqb32a6qzbw0faq7221g7qavkmzl-patch-2.7.6/bin:/nix/store/5x504frx7wbq19app1xrz52f9mvqbhb9-xz-5.6.3-bin/bin:/nix/store/p6hbsaynscr2afvg6v1n2nw3w7g75vgd-file-5.45/bin'
+PATH='/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/bin:/nix/store/700a0ayy1s1h7zg9dqiqy0xvmhfr26l6-clang-wrapper-16.0.6/bin:/nix/store/r0w268903vjlq1vrnajb3lvll4hs5z8g-clang-16.0.6/bin:/nix/store/4axvrmlyszz77x66am0damj6pz4jh683-coreutils-9.5/bin:/nix/store/vnkvxq7wqxg180awsv2rmira5pvc875p-cctools-binutils-darwin-wrapper-1010.6/bin:/nix/store/wli7d4k9sh4c6fwarw3afc5g5axwbjm8-cctools-binutils-darwin-1010.6/bin:/nix/store/p2m1yki058ajw7rfcs1gmvhz3mlpjv9b-xcbuild-0.1.1-unstable-2019-11-20-xcrun/bin:/nix/store/dvmq3xa54hfik85259wyf281m076s14h-libiconv-107/bin:/nix/store/4axvrmlyszz77x66am0damj6pz4jh683-coreutils-9.5/bin:/nix/store/pk36s5bggzr8nwb9pisp4yy3r5nk8099-findutils-4.10.0/bin:/nix/store/jaax21mi17ijk3dxx5mn7ralw9sgv4xv-diffutils-3.10/bin:/nix/store/r0sjy6i8dmm0snm63hc5i4a7nijw1pw5-gnused-4.9/bin:/nix/store/fay4393fknlsn89l6ifzk4m3pfwbxk0a-gnugrep-3.11/bin:/nix/store/pd5r50d0yjbk5542kii9mj1rvs4fp3rv-gawk-5.3.1/bin:/nix/store/kmil8v4r168frg56f9aync1j4j8lvcr3-gnutar-1.35/bin:/nix/store/203vr06z8isiffinykb2v1asij8pka54-gzip-1.13/bin:/nix/store/bsbh4173ym99hv0nad74ygz869pvnkby-bzip2-1.0.8-bin/bin:/nix/store/jr9m0plz39q5nml33h1n2nyv6qrn8vrw-gnumake-4.4.1/bin:/nix/store/rj7zvmif800bgg3sbznq6g5g438jx104-bash-5.2p37/bin:/nix/store/rcn2sqb32a6qzbw0faq7221g7qavkmzl-patch-2.7.6/bin:/nix/store/5x504frx7wbq19app1xrz52f9mvqbhb9-xz-5.6.3-bin/bin:/nix/store/p6hbsaynscr2afvg6v1n2nw3w7g75vgd-file-5.45/bin'
 export PATH
 PATH_LOCALE='/nix/store/c9k6g6fpv126yzxp4dznvdaxyc21ya51-locale-118/share/locale'
 export PATH_LOCALE
@@ -84,7 +84,7 @@ PYTHONHASHSEED='0'
 export PYTHONHASHSEED
 PYTHONNOUSERSITE='1'
 export PYTHONNOUSERSITE
-PYTHONPATH='/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/lib/python3.12/site-packages:/nix/store/fx9c8g2f77q8rmvlrqwmmfhxajky9s2h-python3.12-poetry-1.8.4/lib/python3.12/site-packages'
+PYTHONPATH='/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/lib/python3.12/site-packages'
 export PYTHONPATH
 RANLIB='ranlib'
 export RANLIB
@@ -100,7 +100,7 @@ STRINGS='strings'
 export STRINGS
 STRIP='strip'
 export STRIP
-XDG_DATA_DIRS='/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/share:/nix/store/fx9c8g2f77q8rmvlrqwmmfhxajky9s2h-python3.12-poetry-1.8.4/share'
+XDG_DATA_DIRS='/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7/share'
 export XDG_DATA_DIRS
 ZERO_AR_DATE='1'
 export ZERO_AR_DATE
@@ -172,9 +172,9 @@ mesonFlags=''
 export mesonFlags
 name='nix-shell-env'
 export name
-nativeBuildInputs='/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7 /nix/store/fx9c8g2f77q8rmvlrqwmmfhxajky9s2h-python3.12-poetry-1.8.4'
+nativeBuildInputs='/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7'
 export nativeBuildInputs
-out='/Users/slugboi/Documents/ITU/6_Semester/bswu_project/Fenwick_Trees/manim/manim_DSA_test/outputs/out'
+out='/Users/slugboi/Documents/ITU/6_Semester/bswu_project/Fenwick_Trees/outputs/out'
 export out
 outputBin='out'
 outputDev='out'
@@ -193,7 +193,7 @@ phases='buildPhase'
 export phases
 pkg='/nix/store/4s8z8il6zyq77ixy4b8kfzwsnz90vsrm-apple-sdk-11.3'
 declare -a pkgsBuildBuild=()
-declare -a pkgsBuildHost=('/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7' '/nix/store/fx9c8g2f77q8rmvlrqwmmfhxajky9s2h-python3.12-poetry-1.8.4' '/nix/store/07j8xmbhrc7rhvkmh742hjcdxypxzv59-update-autotools-gnu-config-scripts-hook' '/nix/store/h9lc1dpi14z7is86ffhl3ld569138595-audit-tmpdir.sh' '/nix/store/m54bmrhj6fqz8nds5zcj97w9s9bckc9v-compress-man-pages.sh' '/nix/store/wgrbkkaldkrlrni33ccvm3b6vbxzb656-make-symlinks-relative.sh' '/nix/store/5yzw0vhkyszf2d179m0qfkgxmp5wjjx4-move-docs.sh' '/nix/store/fyaryjvghbkpfnsyw97hb3lyb37s1pd6-move-lib64.sh' '/nix/store/kd4xwxjpjxi71jkm6ka0np72if9rm3y0-move-sbin.sh' '/nix/store/pag6l61paj1dc9sv15l7bm5c17xn5kyk-move-systemd-user-units.sh' '/nix/store/jivxp510zxakaaic7qkrb7v1dd2rdbw9-multiple-outputs.sh' '/nix/store/12lvf0c7xric9cny7slvf9cmhypl1p67-patch-shebangs.sh' '/nix/store/cickvswrvann041nqxb0rxilc46svw1n-prune-libtool-files.sh' '/nix/store/xyff06pkhki3qy1ls77w10s0v79c9il0-reproducible-builds.sh' '/nix/store/aazf105snicrlvyzzbdj85sx4179rpfp-set-source-date-epoch-to-latest.sh' '/nix/store/gps9qrh99j7g02840wv5x78ykmz30byp-strip.sh' '/nix/store/700a0ayy1s1h7zg9dqiqy0xvmhfr26l6-clang-wrapper-16.0.6' '/nix/store/vnkvxq7wqxg180awsv2rmira5pvc875p-cctools-binutils-darwin-wrapper-1010.6' '/nix/store/p2m1yki058ajw7rfcs1gmvhz3mlpjv9b-xcbuild-0.1.1-unstable-2019-11-20-xcrun' )
+declare -a pkgsBuildHost=('/nix/store/2djmffykchgm4q4j7ylv7xgkg441mp2j-python3-3.12.7' '/nix/store/07j8xmbhrc7rhvkmh742hjcdxypxzv59-update-autotools-gnu-config-scripts-hook' '/nix/store/h9lc1dpi14z7is86ffhl3ld569138595-audit-tmpdir.sh' '/nix/store/m54bmrhj6fqz8nds5zcj97w9s9bckc9v-compress-man-pages.sh' '/nix/store/wgrbkkaldkrlrni33ccvm3b6vbxzb656-make-symlinks-relative.sh' '/nix/store/5yzw0vhkyszf2d179m0qfkgxmp5wjjx4-move-docs.sh' '/nix/store/fyaryjvghbkpfnsyw97hb3lyb37s1pd6-move-lib64.sh' '/nix/store/kd4xwxjpjxi71jkm6ka0np72if9rm3y0-move-sbin.sh' '/nix/store/pag6l61paj1dc9sv15l7bm5c17xn5kyk-move-systemd-user-units.sh' '/nix/store/jivxp510zxakaaic7qkrb7v1dd2rdbw9-multiple-outputs.sh' '/nix/store/12lvf0c7xric9cny7slvf9cmhypl1p67-patch-shebangs.sh' '/nix/store/cickvswrvann041nqxb0rxilc46svw1n-prune-libtool-files.sh' '/nix/store/xyff06pkhki3qy1ls77w10s0v79c9il0-reproducible-builds.sh' '/nix/store/aazf105snicrlvyzzbdj85sx4179rpfp-set-source-date-epoch-to-latest.sh' '/nix/store/gps9qrh99j7g02840wv5x78ykmz30byp-strip.sh' '/nix/store/700a0ayy1s1h7zg9dqiqy0xvmhfr26l6-clang-wrapper-16.0.6' '/nix/store/vnkvxq7wqxg180awsv2rmira5pvc875p-cctools-binutils-darwin-wrapper-1010.6' '/nix/store/p2m1yki058ajw7rfcs1gmvhz3mlpjv9b-xcbuild-0.1.1-unstable-2019-11-20-xcrun' )
 declare -a pkgsBuildTarget=()
 declare -a pkgsHostHost=('/nix/store/m0cya4abxw5nlrc7x2m8s0jypny7x36j-libcxx-16.0.6-dev' '/nix/store/dz88k1z9k73yksm4x78qx7w4mxcgirpi-libcxx-16.0.6' '/nix/store/w6agvr7fbc0090qmgjqzppgyskqrjr6w-compiler-rt-libc-16.0.6-dev' '/nix/store/z237yyffpqhpz7lz6jz27pjdb1gpn826-compiler-rt-libc-16.0.6' )
 declare -a pkgsHostTarget=('/nix/store/4s8z8il6zyq77ixy4b8kfzwsnz90vsrm-apple-sdk-11.3' '/nix/store/8fr60sg82dqy3pvh03wpl63wzcnkaa79-libiconv-107-dev' '/nix/store/dvmq3xa54hfik85259wyf281m076s14h-libiconv-107' '/nix/store/kqzdzql05x9sh97dvdpcibqii2jd0mza-libresolv-83-dev' '/nix/store/bka1xflm8s6yapz6dpagbgb2gv8adic3-libresolv-83' '/nix/store/zk9mr46qk2la691z6mnkb1q412ccxqyj-libsbuf-14.1.0-dev' '/nix/store/vpklhbyay6i1s6hh3w9h4cfx0h572f7w-libsbuf-14.1.0' '/nix/store/2wfsrqifxrf2qc81wsgvnn412v4c23r3-cups-headers-2.4.11' )
@@ -205,7 +205,7 @@ preConfigurePhases=' updateAutotoolsGnuConfigScriptsPhase'
 declare -a preFixupHooks=('_moveToShare' '_multioutDocs' '_multioutDevs' )
 preferLocalBuild='1'
 export preferLocalBuild
-prefix='/Users/slugboi/Documents/ITU/6_Semester/bswu_project/Fenwick_Trees/manim/manim_DSA_test/outputs/out'
+prefix='/Users/slugboi/Documents/ITU/6_Semester/bswu_project/Fenwick_Trees/outputs/out'
 declare -a propagatedBuildDepFiles=('propagated-build-build-deps' 'propagated-native-build-inputs' 'propagated-build-target-deps' )
 propagatedBuildInputs=''
 export propagatedBuildInputs
@@ -215,7 +215,7 @@ export propagatedNativeBuildInputs
 declare -a propagatedTargetDepFiles=('propagated-target-target-deps' )
 shell='/nix/store/rj7zvmif800bgg3sbznq6g5g438jx104-bash-5.2p37/bin/bash'
 export shell
-shellHook='echo "Please use poetry shell to activate the virtual environment"
+shellHook='echo "--* Shell and conda env activated *--"
 '
 export shellHook
 stdenv='/nix/store/0c5hnhrh7sb6gsz1rjka2zhv48sfp9wf-stdenv-darwin'
