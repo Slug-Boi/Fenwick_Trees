@@ -6,6 +6,7 @@ dependencies:
   - python=3.12
   - pip
   - manim=0.18.1
+  - maturin
   - pip:
     - manim-dsa
 
