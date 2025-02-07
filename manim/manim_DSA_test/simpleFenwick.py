@@ -42,14 +42,11 @@ class Test(Scene):
             boxes.append((box, numText))
             self.play(Create(box), Write(numText), run_time=0.5)
 
-
-        self.play(
-            startArray[0].animate.highlight(stroke_color=PINK),
-            startArray[1].animate.highlight(stroke_color=PINK),
-        )
-
         plus = plus_sign(0, boxes)
-        self.play(Write(plus))
+        self.play(Write(plus),
+                  startArray[0].animate.highlight(stroke_color=PINK),
+                  startArray[1].animate.highlight(stroke_color=PINK)
+                  )
         self.wait(0.5)
         self.play(Unwrite(plus))
 
@@ -66,13 +63,17 @@ class Test(Scene):
         # integer = Integer(number=4).scale(1.8)
         # self.add(integer)
 
-
         self.play(
             Transform(boxes[1][0], newLevel), 
             FadeTransform(boxes[1][1], Text("12", stroke_width=3).move_to(newLevel.get_center()), stretch=False),
             #rate_func=linear,
             # run_time=0.6
         )
+
+        # self.play(
+        #     startArray[0].animate.unhighlight(),
+        #     startArray[1].animate.unhighlight(),
+        # )
 
         newNewLevel = (
             Rectangle(height=1, width=2.27*2+0.23)
@@ -84,7 +85,11 @@ class Test(Scene):
 
         plus = plus_sign(2, boxes)
         plus2 = plus_sign_manual(newLevel, 0)
-        self.play(Write(plus), Write(plus2))
+        self.play(Write(plus),
+                  Write(plus2),
+                  startArray[2].animate.highlight(stroke_color=PINK),
+                  startArray[3].animate.highlight(stroke_color=PINK)
+                  )
         self.wait(0.5)
         self.play(Unwrite(plus), Unwrite(plus2))
 
@@ -107,8 +112,16 @@ class Test(Scene):
             .set_fill(BLUE, opacity=1)
         )
 
+        self.play(startArray[0].animate.unhighlight(),
+                  startArray[1].animate.unhighlight(),
+                  startArray[2].animate.unhighlight(),
+                  startArray[3].animate.unhighlight())
+
         plus = plus_sign(4, boxes)
-        self.play(Write(plus))
+        self.play(Write(plus),
+                  startArray[4].animate.highlight(stroke_color=PINK),
+                  startArray[5].animate.highlight(stroke_color=PINK)
+                  )
         self.wait(0.5)
         self.play(Unwrite(plus))
 
@@ -130,7 +143,16 @@ class Test(Scene):
         plus = plus_sign(6, boxes)
         plus2 = plus_sign_manual(newNewLevel, 0)
         plus3 = plus_sign_manual(newNewNewLevel, 0)
-        self.play(Write(plus), Write(plus2), Write(plus3))
+        self.play(Write(plus), 
+                  Write(plus2), 
+                  Write(plus3),
+                  startArray[0].animate.highlight(stroke_color=PINK),
+                  startArray[1].animate.highlight(stroke_color=PINK),
+                  startArray[2].animate.highlight(stroke_color=PINK),
+                  startArray[3].animate.highlight(stroke_color=PINK),
+                  startArray[6].animate.highlight(stroke_color=PINK),
+                  startArray[7].animate.highlight(stroke_color=PINK)
+                  )
         self.wait(0.5)
         self.play(Unwrite(plus), Unwrite(plus2), Unwrite(plus3))
 
@@ -142,6 +164,8 @@ class Test(Scene):
         )
 
         self.wait(1)
+
+        self.play(*[i.animate.unhighlight() for i in startArray])
     
     def moveNumBox(self, box, direction, amount):
         self.play(
