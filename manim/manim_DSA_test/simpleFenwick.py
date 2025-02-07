@@ -166,6 +166,43 @@ class Test(Scene):
         self.wait(1)
 
         self.play(*[i.animate.unhighlight() for i in startArray])
+
+
+        # QUERY PART
+        queryText = Text("")
+        #self.play(Write(queryText))
+        for i in range(array.__len__()):
+            queryText.become(Text(f"Query: SUM({i})").to_edge(UP+LEFT+DOWN*0.5).scale(0.7))
+            # Find a prettier way of doing this
+            self.play(Write(queryText))
+            self.wait(0.5)
+
+
+            highlight_indices = []
+            z = i
+            while z >= 0:
+                highlight_indices.append(z)
+                z = (z & (z + 1)) - 1
+            
+            line = Line(startArray[0].get_bottom()+DOWN*0.2 + LEFT * (startArray[0].width/2), 
+            startArray[i].get_bottom()+DOWN*0.2 + RIGHT * (startArray[i].width/2))
+            line.set_color(PINK)
+            line.set_stroke(width=5)
+            self.play(startArray[i].animate.highlight(stroke_color=PINK),
+                      Create(line))
+            
+            self.wait(0.5)
+
+            self.play(*[boxes[j][0].animate.set_fill(BLUE, opacity=1) for j in range(len(boxes))],
+                      *[boxes[j][0].animate.set_fill(PINK, opacity=1) for j in highlight_indices],
+                      )
+            
+            self.play(Unwrite(queryText))
+
+        # Plus 2 is magick number i have no clue
+        #self.play(*[i.animate.highlight(stroke_color=PINK) for i in startArray.submobjects[:query+2]])
+
+
     
     def moveNumBox(self, box, direction, amount):
         self.play(
