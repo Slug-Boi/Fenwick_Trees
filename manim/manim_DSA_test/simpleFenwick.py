@@ -1,6 +1,20 @@
 from manim import *
 from manim_dsa import *
 
+
+def plus_sign(boxnum, boxes):
+    plus = Text("+", stroke_width=3)
+    plus.z_index = 1
+    box = boxes[boxnum][0]
+    plus.move_to(box.get_center()+RIGHT*((box.width/2)+0.135)+UP*(box.height/2+0.135))
+    return plus
+
+def plus_sign_manual(box, elevate):
+    plus = Text("+", stroke_width=3)
+    plus.z_index = 1
+    plus.move_to(box.get_center()+RIGHT*(box.width/2+0.27)+UP*elevate)
+    return plus
+
 class Test(Scene):
     def construct(self):
         array = [4,8,5,2,6,1,0,8]
@@ -34,6 +48,11 @@ class Test(Scene):
             startArray[1].animate.highlight(stroke_color=PINK),
         )
 
+        plus = plus_sign(0, boxes)
+        self.play(Write(plus))
+        self.wait(0.5)
+        self.play(Unwrite(plus))
+
         self.moveNumBox(boxes[1], UP, UPLEVEL)
 
         newLevel = (
@@ -46,6 +65,7 @@ class Test(Scene):
         
         # integer = Integer(number=4).scale(1.8)
         # self.add(integer)
+
 
         self.play(
             Transform(boxes[1][0], newLevel), 
@@ -61,6 +81,12 @@ class Test(Scene):
             .shift(UP*UPLEVEL*2)
             .set_fill(BLUE, opacity=1)
         )
+
+        plus = plus_sign(2, boxes)
+        plus2 = plus_sign_manual(newLevel, 0)
+        self.play(Write(plus), Write(plus2))
+        self.wait(0.5)
+        self.play(Unwrite(plus), Unwrite(plus2))
 
         self.moveNumBox(boxes[3], UP, UPLEVEL*2)
 
@@ -81,6 +107,11 @@ class Test(Scene):
             .set_fill(BLUE, opacity=1)
         )
 
+        plus = plus_sign(4, boxes)
+        self.play(Write(plus))
+        self.wait(0.5)
+        self.play(Unwrite(plus))
+
         self.moveNumBox(boxes[5], UP, UPLEVEL)
         
         self.play(
@@ -96,6 +127,13 @@ class Test(Scene):
             .set_fill(BLUE, opacity=1)
         )
 
+        plus = plus_sign(6, boxes)
+        plus2 = plus_sign_manual(newNewLevel, 0)
+        plus3 = plus_sign_manual(newNewNewLevel, 0)
+        self.play(Write(plus), Write(plus2), Write(plus3))
+        self.wait(0.5)
+        self.play(Unwrite(plus), Unwrite(plus2), Unwrite(plus3))
+
         self.moveNumBox(boxes[7], UP, UPLEVEL*3)
 
         self.play(
@@ -103,7 +141,6 @@ class Test(Scene):
             FadeTransform(boxes[7][1], Text("34", stroke_width=3).move_to(finalLevel.get_center()), stretch=False),
         )
 
-        # self.play(Create(box1), Create(num1))
         self.wait(1)
     
     def moveNumBox(self, box, direction, amount):
