@@ -20,3 +20,5 @@ print(fenwick_tree.sum(2))
 newtree = fenwick_tree.new_file("test.txt")
 
 print(newtree.get_tree())
+
+print(newtree.get_sum_indices(3))
