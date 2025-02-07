@@ -27,6 +27,9 @@ class Test(Scene):
 
         self.play(Create(startArray), run_time=3)
         self.play(startArray.animate.to_edge(UP))
+
+        box_group = VGroup()
+        text_group = VGroup()
         
         boxes = []
         for num in array:
@@ -40,7 +43,10 @@ class Test(Scene):
                 .move_to(box.get_center())
             )
             boxes.append((box, numText))
-            self.play(Create(box), Write(numText), run_time=0.5)
+            box_group.add(box)
+            text_group.add(numText)
+
+        self.play(Create(box_group,lag_ratio=0.1), Write(text_group, lag_ratio=0.1))
 
         plus = plus_sign(0, boxes)
         self.play(Write(plus),
