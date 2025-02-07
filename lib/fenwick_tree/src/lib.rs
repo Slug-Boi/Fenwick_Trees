@@ -1,5 +1,7 @@
-use pyo3::prelude::*;
-use rayon::{option, prelude::*};
+use pyo3::{prelude::*, types::PyString};
+use std::fs;
+use std::io::prelude::*;
+use rayon::{option, prelude::*, string};
 
 /// A Python module implemented in Rust.
 #[pymodule]
@@ -69,17 +71,37 @@ impl FenwickTree {
         }
     }
 
+    // Base constructor for the fenwick tree. Takes a vector of i32s and constructs the tree
     #[new]
-    fn new(size: i32) -> Self {
-        let mut tree = vec![0; (size + 1) as usize];
-        tree[0] = -9999; // Placeholder for 1-indexed tree
+    fn new(input: Vec<i32>) -> Self {
+        let size = input.len() as i32;
+        let mut tree = vec![0; size as usize + 1];
+        tree.insert(0, -9999); // Placeholder value to make the tree 1 indexed
         let mut fenwick_tree = FenwickTree { tree, size };
         for x in 0..size {
-            // dbg!(x);
-            fenwick_tree.update(x, x+1);
-        }
+            fenwick_tree.update(x, input[x as usize]);
+        }           
 
         return fenwick_tree;
+    }
+    
+    // Constructor for the fenwick tree that takes a file path and constructs the tree
+    #[staticmethod]
+    fn new_file(path: String) -> Self {
+        let input: Vec<i32> = fs::read_to_string(path)
+            .expect("Something went wrong reading the file")
+            .split_whitespace()
+            .map(|x| x.parse::<i32>().unwrap())
+            .collect();
+
+    let size = input.len() as i32;
+    let mut tree = vec![0; size as usize + 1];
+    tree.insert(0, -9999); // Placeholder value to make the tree 1 indexed
+    let mut fenwick_tree = FenwickTree { tree, size };
+    for x in 0..size {
+        fenwick_tree.update(x, input[x as usize]);
+    }
+    fenwick_tree
     }
 
     fn sum(&self, mut index: i32) -> i32 {
