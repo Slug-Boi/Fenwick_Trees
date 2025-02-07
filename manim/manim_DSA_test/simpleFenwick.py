@@ -172,7 +172,7 @@ class Test(Scene):
         queryText = Text("")
         #self.play(Write(queryText))
         for i in range(array.__len__()):
-            queryText.become(Text(f"Query: SUM({i})").to_edge(UP+LEFT+DOWN*0.5).scale(0.7))
+            queryText.become(Text(f"Query: SUM({i})").to_edge(UP*2+RIGHT*-0.1).scale(0.85))
             # Find a prettier way of doing this
             self.play(Write(queryText))
             self.wait(0.5)
