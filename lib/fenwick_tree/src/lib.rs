@@ -128,6 +128,29 @@ impl FenwickTree {
         sum
     }
 
+    // Returns a vector of indices that are used to calculate the sum of the elements in the range [0, index]
+    fn get_sum_indices(&self, mut index: i32) -> Vec<i32> {
+        // 1 indexed cause that just how it be
+        index = index + 1;
+        let mut indices = Vec::new();
+
+        while index > 0 {
+            indices.push(index);
+            index -= index & -index;
+        }
+
+        indices
+    }
+
+    // Returns a vector of indices that are used to calculate the sum of the elements in the range [left, right]
+    fn get_range_sum_indices(&self, left: i32, right: i32) -> Vec<i32> {
+        let mut left_indices = self.get_sum_indices(left - 1);
+        let mut right_indices = self.get_sum_indices(right);
+
+        left_indices.append(&mut right_indices);
+        left_indices
+    }
+
     // Returns the sum of the elements in the range [left, right]
     fn range_sum(&self, left: i32, right: i32) -> i32 {
         self.sum(right) - self.sum(left - 1)
