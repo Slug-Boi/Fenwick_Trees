@@ -1,5 +1,6 @@
 from manim import *
 from manim_dsa import *
+from copy import deepcopy
 
 
 def plus_sign(boxnum, boxes):
@@ -14,6 +15,20 @@ def plus_sign_manual(box, elevate):
     plus.z_index = 1
     plus.move_to(box.get_center()+RIGHT*(box.width/2+0.27)+UP*elevate)
     return plus
+
+def updateArrayValue(array: MArray, index: int, newValue: int) -> Text:
+    oldIndex = array.submobjects[index+1].submobjects[1]
+    newIndex = (
+        Text(str(newValue),
+             font=oldIndex.font,
+             font_size=oldIndex.font_size,
+             stroke_width=oldIndex.stroke_width,
+             weight=oldIndex.weight
+        )
+        .match_style(oldIndex)
+        .move_to(oldIndex)
+    )
+    return newIndex
 
 class Test(Scene):
     def construct(self):
@@ -69,12 +84,14 @@ class Test(Scene):
         # integer = Integer(number=4).scale(1.8)
         # self.add(integer)
 
+        newText = Text("12", stroke_width=3).move_to(newLevel.get_center())
         self.play(
             Transform(boxes[1][0], newLevel), 
-            FadeTransform(boxes[1][1], Text("12", stroke_width=3).move_to(newLevel.get_center()), stretch=False),
+            FadeTransform(boxes[1][1], newText, stretch=False),
             #rate_func=linear,
             # run_time=0.6
         )
+        boxes[1] = (boxes[1][0], newText)
 
         # self.play(
         #     startArray[0].animate.unhighlight(),
@@ -101,14 +118,16 @@ class Test(Scene):
 
         self.moveNumBox(boxes[3], UP, UPLEVEL*2)
 
+        newText = Text("19", stroke_width=3).move_to(newNewLevel.get_center())
         self.play(
             Transform(boxes[3][0], newNewLevel),
             # FadeOut(boxes[3][1]),
             # FadeIn(Text("19", stroke_width=3).move_to(newNewLevel.get_center()))
-            FadeTransform(boxes[3][1], Text("19", stroke_width=3).move_to(newNewLevel.get_center()), stretch=False),
+            FadeTransform(boxes[3][1], newText, stretch=False),
             # rate_func=linear,
             # run_time=0.75
         )
+        boxes[3] = (boxes[3][0], newText)
 
         newNewNewLevel = (
             Rectangle(height=1, width=2.27)
@@ -133,10 +152,12 @@ class Test(Scene):
 
         self.moveNumBox(boxes[5], UP, UPLEVEL)
         
+        newText = Text("7", stroke_width=3).move_to(newNewNewLevel.get_center())
         self.play(
             Transform(boxes[5][0], newNewNewLevel),
-            FadeTransform(boxes[5][1], Text("7", stroke_width=3).move_to(newNewNewLevel.get_center()), stretch=False),
+            FadeTransform(boxes[5][1], newText, stretch=False),
         )
+        boxes[5] = (boxes[7][0], newText)
 
         finalLevel = (
             Rectangle(height=1, width=2.27*4+0.23*3)
@@ -164,10 +185,12 @@ class Test(Scene):
 
         self.moveNumBox(boxes[7], UP, UPLEVEL*3)
 
+        newText = Text("34", stroke_width=3).move_to(finalLevel.get_center())
         self.play(
             Transform(boxes[7][0], finalLevel),
-            FadeTransform(boxes[7][1], Text("34", stroke_width=3).move_to(finalLevel.get_center()), stretch=False),
+            FadeTransform(boxes[7][1], newText, stretch=False),
         )
+        boxes[7] = (boxes[7][0], newText)
 
         self.wait(1)
 
@@ -208,7 +231,45 @@ class Test(Scene):
         # Plus 2 is magick number i have no clue
         #self.play(*[i.animate.highlight(stroke_color=PINK) for i in startArray.submobjects[:query+2]])
 
+        # Query clean up
+        self.play(
+            *[i.animate.unhighlight() for i in startArray],
+            boxes[-1][0].animate.set_fill(BLUE, opacity=1),
+            FadeOut(line)
+        )
 
+        """
+        Update part vvv
+        """
+        updateText = (
+            Text("Update(2, 3)")
+            .to_edge(UP)
+            .to_edge(LEFT)
+        )
+        self.play(Write(updateText))
+
+        newIndex = updateArrayValue(startArray, 2, 3)
+        self.play(startArray[2].animate.highlight(stroke_color=PINK))
+        self.play(Unwrite(startArray.submobjects[3].submobjects[1]))
+        self.wait(0.3)
+        self.play(Write(newIndex))
+
+        self.play(boxes[2][0].animate.set_fill(PINK))
+        self.play(Unwrite(boxes[2][1]))
+        self.wait(0.3)
+        self.play(Write(Text("3", stroke_width=3).move_to(boxes[2][0].get_center())))
+        
+        self.play(boxes[3][0].animate.set_fill(PINK, opacity=1))
+        self.play(Unwrite(boxes[3][1]))
+        self.wait(0.3)
+        self.play(Write(Text("17", stroke_width=3).move_to(boxes[3][0].get_center())))
+
+        self.play(boxes[-1][0].animate.set_fill(PINK, opacity=1))
+        self.play(Unwrite(boxes[-1][1]))
+        self.wait(0.3)
+        self.play(Write(Text("32", stroke_width=3).move_to(boxes[-1][0].get_center())))
+
+        self.wait(1)
     
     def moveNumBox(self, box, direction, amount):
         self.play(
