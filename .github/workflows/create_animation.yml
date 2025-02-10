@@ -30,6 +30,7 @@ jobs:
       run: |
         source $CONDA/etc/profile.d/conda.sh
         conda activate fenwick_manim
+        cd lib/fenwick_tree && maturin develop && cd ../..
         cd manim/$MANIM_FOLDER
         manim -pqh *.py $MANIM_SCENE
         tar -czf media.tar.gz media
