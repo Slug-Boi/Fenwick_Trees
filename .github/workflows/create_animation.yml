@@ -3,7 +3,7 @@ name: Build Animation as artifact
 on:
     push:
       tags:
-        - 'manim_*_*'
+        - 'manim;*;*'
 
 jobs:
   build:
