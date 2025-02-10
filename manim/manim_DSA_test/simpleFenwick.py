@@ -147,7 +147,7 @@ class Test(Scene):
         )
         boxes[3] = (boxes[3][0], sumText)
 
-        newNewNewLevel = (
+        sumBox3 = (
             Rectangle(height=1, width=2.27)
             .align_to(boxes[4][0].get_left(), LEFT)
             .to_edge(DOWN)
@@ -170,14 +170,14 @@ class Test(Scene):
 
         self.moveNumBox(boxes[5], UP, UPLEVEL)
         
-        sumText = Text(str(fenwick_tree.range_sum(4,5)), stroke_width=3).move_to(newNewNewLevel.get_center())
+        sumText = Text(str(fenwick_tree.range_sum(4,5)), stroke_width=3).move_to(sumBox3.get_center())
         self.play(
-            Transform(boxes[5][0], newNewNewLevel),
+            Transform(boxes[5][0], sumBox3),
             FadeTransform(boxes[5][1], sumText, stretch=False),
         )
         boxes[5] = (boxes[5][0], sumText)
 
-        finalLevel = (
+        sumBox4 = (
             Rectangle(height=1, width=2.27*4+0.23*3)
             .align_to(boxes[0][0].get_left(), LEFT)
             .to_edge(DOWN)
@@ -187,7 +187,7 @@ class Test(Scene):
 
         plus = plus_sign(6, boxes)
         plus2 = plus_sign_manual(sumBox2, 0)
-        plus3 = plus_sign_manual(newNewNewLevel, 0)
+        plus3 = plus_sign_manual(sumBox3, 0)
         self.play(Write(plus), 
                   Write(plus2), 
                   Write(plus3),
@@ -203,9 +203,9 @@ class Test(Scene):
 
         self.moveNumBox(boxes[7], UP, UPLEVEL*3)
 
-        sumText = Text(str(fenwick_tree.sum(7)), stroke_width=3).move_to(finalLevel.get_center())
+        sumText = Text(str(fenwick_tree.sum(7)), stroke_width=3).move_to(sumBox4.get_center())
         self.play(
-            Transform(boxes[7][0], finalLevel),
+            Transform(boxes[7][0], sumBox4),
             FadeTransform(boxes[7][1], sumText, stretch=False),
         )
         boxes[7] = (boxes[7][0], sumText)
