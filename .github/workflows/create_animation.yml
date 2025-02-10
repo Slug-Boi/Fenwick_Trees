@@ -5,6 +5,9 @@ on:
       tags:
         - 'manim;*;*'
 
+env: 
+
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -41,5 +44,6 @@ jobs:
         path: manim/${{ env.MANIM_FOLDER }}/media.tar.gz
     - uses: ClementTsang/delete-tag-and-release@v0.3.1
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        tag_name: ${{ github.ref_name }}
+        tag: ${{ github.ref_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
