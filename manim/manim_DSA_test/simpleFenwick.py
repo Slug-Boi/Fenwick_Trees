@@ -59,23 +59,25 @@ class Test(Scene):
         self.play(Create(startArray), run_time=3)
         self.play(startArray.animate.to_edge(UP))
 
+        # Using groups to draw using lag ratio delete after
         box_group = VGroup()
         text_group = VGroup()
         
         boxes = []
         for num in array:
             box = Square(1).set_fill(BLUE, opacity=1)
-            if len(boxes) <= 0:
-                box.to_edge(DOWN).to_edge(LEFT)
-            else:
-                box.next_to(boxes[-1][0])
-            numText = (
-                Text(str(num), stroke_width=3)
-                .move_to(box.get_center())
-            )
+            numText = (Text(str(num), stroke_width=3))
+
             boxes.append((box, numText))
             box_group.add(box)
             text_group.add(numText)
+
+        # Aligning the boxes and text
+        box_group.arrange()
+        box_group.to_edge(DOWN)
+        for i in range(len(boxes)):
+            boxes[i][1].move_to(boxes[i][0].get_center())        
+
 
         self.play(Create(box_group,lag_ratio=0.1), Write(text_group, lag_ratio=0.1))
 
@@ -89,9 +91,9 @@ class Test(Scene):
 
         self.moveNumBox(boxes[1], UP, UPLEVEL)
 
-        newLevel = (
+        sumBox1 = (
             Rectangle(height=1, width=2.27) # 2.27 is the width of 2 square with the gap
-            .to_edge(LEFT)
+            .align_to(boxes[0][0].get_left(), LEFT)
             .to_edge(DOWN)
             .shift(UP*UPLEVEL)
             .set_fill(BLUE, opacity=1)
@@ -100,30 +102,30 @@ class Test(Scene):
         # integer = Integer(number=4).scale(1.8)
         # self.add(integer)
 
-        newText = Text(str(fenwick_tree.sum(1)), stroke_width=3).move_to(newLevel.get_center())
+        sumText = Text(str(fenwick_tree.sum(1)), stroke_width=3).move_to(sumBox1.get_center())
         self.play(
-            Transform(boxes[1][0], newLevel), 
-            FadeTransform(boxes[1][1], newText, stretch=False),
+            Transform(boxes[1][0], sumBox1), 
+            FadeTransform(boxes[1][1], sumText, stretch=False),
             #rate_func=linear,
             # run_time=0.6
         )
-        boxes[1] = (boxes[1][0], newText)
+        boxes[1] = (boxes[1][0], sumText)
 
         # self.play(
         #     startArray[0].animate.unhighlight(),
         #     startArray[1].animate.unhighlight(),
         # )
 
-        newNewLevel = (
+        sumBox2 = (
             Rectangle(height=1, width=2.27*2+0.23)
-            .to_edge(LEFT)
+            .align_to(boxes[1][0].get_left(), LEFT)
             .to_edge(DOWN)
             .shift(UP*UPLEVEL*2)
             .set_fill(BLUE, opacity=1)
         )
 
         plus = plus_sign(2, boxes)
-        plus2 = plus_sign_manual(newLevel, 0)
+        plus2 = plus_sign_manual(sumBox1, 0)
         self.play(Write(plus),
                   Write(plus2),
                   startArray[2].animate.highlight(stroke_color=PINK),
@@ -134,16 +136,16 @@ class Test(Scene):
 
         self.moveNumBox(boxes[3], UP, UPLEVEL*2)
 
-        newText = Text(str(fenwick_tree.sum(3)), stroke_width=3).move_to(newNewLevel.get_center())
+        sumText = Text(str(fenwick_tree.sum(3)), stroke_width=3).move_to(sumBox2.get_center())
         self.play(
-            Transform(boxes[3][0], newNewLevel),
+            Transform(boxes[3][0], sumBox2),
             # FadeOut(boxes[3][1]),
             # FadeIn(Text("19", stroke_width=3).move_to(newNewLevel.get_center()))
-            FadeTransform(boxes[3][1], newText, stretch=False),
+            FadeTransform(boxes[3][1], sumText, stretch=False),
             # rate_func=linear,
             # run_time=0.75
         )
-        boxes[3] = (boxes[3][0], newText)
+        boxes[3] = (boxes[3][0], sumText)
 
         newNewNewLevel = (
             Rectangle(height=1, width=2.27)
@@ -168,23 +170,23 @@ class Test(Scene):
 
         self.moveNumBox(boxes[5], UP, UPLEVEL)
         
-        newText = Text(str(fenwick_tree.range_sum(4,5)), stroke_width=3).move_to(newNewNewLevel.get_center())
+        sumText = Text(str(fenwick_tree.range_sum(4,5)), stroke_width=3).move_to(newNewNewLevel.get_center())
         self.play(
             Transform(boxes[5][0], newNewNewLevel),
-            FadeTransform(boxes[5][1], newText, stretch=False),
+            FadeTransform(boxes[5][1], sumText, stretch=False),
         )
-        boxes[5] = (boxes[5][0], newText)
+        boxes[5] = (boxes[5][0], sumText)
 
         finalLevel = (
             Rectangle(height=1, width=2.27*4+0.23*3)
-            .to_edge(LEFT)
+            .align_to(boxes[0][0].get_left(), LEFT)
             .to_edge(DOWN)
             .shift(UP*UPLEVEL*3)
             .set_fill(BLUE, opacity=1)
         )
 
         plus = plus_sign(6, boxes)
-        plus2 = plus_sign_manual(newNewLevel, 0)
+        plus2 = plus_sign_manual(sumBox2, 0)
         plus3 = plus_sign_manual(newNewNewLevel, 0)
         self.play(Write(plus), 
                   Write(plus2), 
@@ -201,12 +203,12 @@ class Test(Scene):
 
         self.moveNumBox(boxes[7], UP, UPLEVEL*3)
 
-        newText = Text(str(fenwick_tree.sum(7)), stroke_width=3).move_to(finalLevel.get_center())
+        sumText = Text(str(fenwick_tree.sum(7)), stroke_width=3).move_to(finalLevel.get_center())
         self.play(
             Transform(boxes[7][0], finalLevel),
-            FadeTransform(boxes[7][1], newText, stretch=False),
+            FadeTransform(boxes[7][1], sumText, stretch=False),
         )
-        boxes[7] = (boxes[7][0], newText)
+        boxes[7] = (boxes[7][0], sumText)
 
         self.wait(1)
 
