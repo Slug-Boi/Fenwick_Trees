@@ -1,5 +1,6 @@
 from manim import *
 from manim_dsa import *
+from fenwick_tree import FenwickTree
 from copy import deepcopy
 
 
@@ -19,7 +20,7 @@ def plus_sign_manual(box, elevate):
 def updateArrayValue(array: MArray, index: int, newValue: int) -> Text:
     oldIndex = array.submobjects[index+1].submobjects[1]
     newIndex = (
-        Text(str(newValue),
+        Text(str(int(oldIndex.text)+newValue),
              font=oldIndex.font,
              font_size=oldIndex.font_size,
              stroke_width=oldIndex.stroke_width,
@@ -30,9 +31,24 @@ def updateArrayValue(array: MArray, index: int, newValue: int) -> Text:
     )
     return newIndex
 
+def updateBoxValue(text: Text, newValue: int) -> Text:
+    newText = (
+        Text(str(int(text.text)+newValue),
+             font=text.font,
+             font_size=text.font_size,
+             stroke_width=text.stroke_width,
+             weight=text.weight
+        )
+        .match_style(text)
+        .move_to(text)
+    )
+    return newText
+
 class Test(Scene):
     def construct(self):
         array = [4,8,5,2,6,1,0,8]
+        fenwick_tree = FenwickTree(array)
+        fenwick_tree_arr = fenwick_tree.get_tree()
         UPLEVEL = 1.3
         startArray = (
             MArray(array, style=MArrayStyle.BLUE)
@@ -84,7 +100,7 @@ class Test(Scene):
         # integer = Integer(number=4).scale(1.8)
         # self.add(integer)
 
-        newText = Text("12", stroke_width=3).move_to(newLevel.get_center())
+        newText = Text(str(fenwick_tree.sum(1)), stroke_width=3).move_to(newLevel.get_center())
         self.play(
             Transform(boxes[1][0], newLevel), 
             FadeTransform(boxes[1][1], newText, stretch=False),
@@ -118,7 +134,7 @@ class Test(Scene):
 
         self.moveNumBox(boxes[3], UP, UPLEVEL*2)
 
-        newText = Text("19", stroke_width=3).move_to(newNewLevel.get_center())
+        newText = Text(str(fenwick_tree.sum(3)), stroke_width=3).move_to(newNewLevel.get_center())
         self.play(
             Transform(boxes[3][0], newNewLevel),
             # FadeOut(boxes[3][1]),
@@ -152,12 +168,12 @@ class Test(Scene):
 
         self.moveNumBox(boxes[5], UP, UPLEVEL)
         
-        newText = Text("7", stroke_width=3).move_to(newNewNewLevel.get_center())
+        newText = Text(str(fenwick_tree.range_sum(4,5)), stroke_width=3).move_to(newNewNewLevel.get_center())
         self.play(
             Transform(boxes[5][0], newNewNewLevel),
             FadeTransform(boxes[5][1], newText, stretch=False),
         )
-        boxes[5] = (boxes[7][0], newText)
+        boxes[5] = (boxes[5][0], newText)
 
         finalLevel = (
             Rectangle(height=1, width=2.27*4+0.23*3)
@@ -185,7 +201,7 @@ class Test(Scene):
 
         self.moveNumBox(boxes[7], UP, UPLEVEL*3)
 
-        newText = Text("34", stroke_width=3).move_to(finalLevel.get_center())
+        newText = Text(str(fenwick_tree.sum(7)), stroke_width=3).move_to(finalLevel.get_center())
         self.play(
             Transform(boxes[7][0], finalLevel),
             FadeTransform(boxes[7][1], newText, stretch=False),
@@ -199,6 +215,7 @@ class Test(Scene):
 
         # QUERY PART
         queryText = Text("")
+        lines = []
         #self.play(Write(queryText))
         for i in range(array.__len__()):
             queryText.become(Text(f"Query: SUM({i})").to_edge(UP*2+RIGHT*-0.1).scale(0.85))
@@ -208,26 +225,31 @@ class Test(Scene):
 
 
             highlight_indices = []
-            z = i
-            while z >= 0:
+            z = i + 1
+            while z > 0:
                 highlight_indices.append(z)
-                z = (z & (z + 1)) - 1
+                z -= -z & z
+
             
-            line = Line(startArray[0].get_bottom()+DOWN*0.2 + LEFT * (startArray[0].width/2), 
+            line = Line(startArray[0].get_bottom()+DOWN*0.2 + LEFT * (startArray[0].width/2),
             startArray[i].get_bottom()+DOWN*0.2 + RIGHT * (startArray[i].width/2))
             line.set_color(PINK)
             line.set_stroke(width=5)
+            lines.append(line)
             self.play(startArray[i].animate.highlight(stroke_color=PINK),
                       Create(line))
             
             self.wait(0.5)
 
-            self.play(*[boxes[j][0].animate.set_fill(BLUE, opacity=1) for j in range(len(boxes))],
-                      *[boxes[j][0].animate.set_fill(PINK, opacity=1) for j in highlight_indices],
+            self.play(*[boxes[j-1][0].animate.set_fill(BLUE, opacity=1) for j in range(len(boxes))],
+                      *[boxes[j-1][0].animate.set_fill(PINK, opacity=1) for j in highlight_indices],
                       )
             
             self.play(Unwrite(queryText))
 
+
+        for l in lines:
+            self.remove(l)
         # Plus 2 is magick number i have no clue
         #self.play(*[i.animate.highlight(stroke_color=PINK) for i in startArray.submobjects[:query+2]])
 
@@ -256,20 +278,23 @@ class Test(Scene):
 
         self.play(boxes[2][0].animate.set_fill(PINK))
         self.play(Unwrite(boxes[2][1]))
+        newIndex = updateBoxValue(boxes[2][1], 3)
         self.wait(0.3)
-        self.play(Write(Text("3", stroke_width=3).move_to(boxes[2][0].get_center())))
+        self.play(Write(Text(newIndex.text, stroke_width=3).move_to(boxes[2][0].get_center())))
         
         self.play(boxes[3][0].animate.set_fill(PINK, opacity=1))
         self.play(Unwrite(boxes[3][1]))
+        newIndex = updateBoxValue(boxes[3][1], 3)
         self.wait(0.3)
-        self.play(Write(Text("17", stroke_width=3).move_to(boxes[3][0].get_center())))
+        self.play(Write(Text(newIndex.text, stroke_width=3).move_to(boxes[3][0].get_center())))
 
         self.play(boxes[-1][0].animate.set_fill(PINK, opacity=1))
         self.play(Unwrite(boxes[-1][1]))
+        newIndex = updateBoxValue(boxes[-1][1], 3)
         self.wait(0.3)
-        self.play(Write(Text("32", stroke_width=3).move_to(boxes[-1][0].get_center())))
+        self.play(Write(Text(newIndex.text, stroke_width=3).move_to(boxes[-1][0].get_center())))
 
-        self.wait(1)
+        self.wait(2)
     
     def moveNumBox(self, box, direction, amount):
         self.play(
