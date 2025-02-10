@@ -1,0 +1,41 @@
+name: Build Animation as artifact
+
+on:
+    push:
+      tags:
+        - 'manim;*;*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup env vars
+      run: |
+        export IFS=';'
+        tag=$(git describe --tags --abbrev=0)
+        read -ra tag_parts <<< "$tag"
+        echo "MANIM_FOLDER=${tag_parts[1]}" >> $GITHUB_ENV
+        echo "MANIM_SCENE=${tag_parts[2]}" >> $GITHUB_ENV
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12.8'
+    - uses: conda-incubator/setup-miniconda@v3
+      with:
+        activate-environment: fenwick_manim
+        environment-file: environment.yml
+        auto-activate-base: false
+    - name: Create Animation
+      run: |
+        source $CONDA/etc/profile.d/conda.sh
+        conda activate fenwick_manim
+        cd lib/fenwick_tree && maturin develop && cd ../..
+        cd manim/$MANIM_FOLDER
+        manim -pqh *.py $MANIM_SCENE
+        tar -czf media.tar.gz media
+    - name: Upload Animation
+      uses: actions/upload-artifact@v4
+      with:
+        name: animation_${{ env.MANIM_SCENE }}
+        path: manim/${{ env.MANIM_FOLDER }}/media.tar.gz
