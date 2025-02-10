@@ -23,7 +23,8 @@ jobs:
         python-version: '3.12.8'
     - uses: conda-incubator/setup-miniconda@v3
       with:
-        activate-environment: environment.yml
+        activate-environment: fenwick_manim
+        environment-file: environment.yml
         auto-activate-base: false
     - name: Create Animation
       run: |
