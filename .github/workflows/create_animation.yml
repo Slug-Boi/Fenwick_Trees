@@ -26,7 +26,6 @@ jobs:
         activate-environment: fenwick_manim
         environment-file: environment.yml
         auto-activate-base: false
-    - name: Create Animation
       run: |
         cd manim/$MANIM_FOLDER
         manim -pqh *.py $MANIM_SCENE
