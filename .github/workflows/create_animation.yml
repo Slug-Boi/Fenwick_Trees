@@ -26,12 +26,12 @@ jobs:
         activate-environment: environment.yml
         auto-activate-base: false
     - name: Create Animation
-      working-directory: ./manim/$MANIM_FOLDER
       run: |
+        cd manim/$MANIM_FOLDER
         manim -pqh *.py $MANIM_SCENE
         tar -czf media.tar.gz media
     - name: Upload Animation
       uses: actions/upload-artifact@v4
       with:
         name: animation_$MANIM_SCENE
-        path: ./manim/$MANIM_FOLDER/media.tar.gz
+        path: manim/$MANIM_FOLDER/media.tar.gz
