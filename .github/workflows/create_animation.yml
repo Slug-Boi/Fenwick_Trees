@@ -37,5 +37,5 @@ jobs:
     - name: Upload Animation
       uses: actions/upload-artifact@v4
       with:
-        name: animation_$MANIM_SCENE
-        path: manim/$MANIM_FOLDER/media.tar.gz
+        name: animation_${{ env.MANIM_SCENE }}
+        path: manim/${{ env.MANIM_FOLDER }}/media.tar.gz
