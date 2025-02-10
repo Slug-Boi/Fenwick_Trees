@@ -28,6 +28,7 @@ jobs:
         auto-activate-base: false
     - name: Create Animation
       run: |
+        conda init
         conda activate fenwick_manim
         cd manim/$MANIM_FOLDER
         manim -pqh *.py $MANIM_SCENE
