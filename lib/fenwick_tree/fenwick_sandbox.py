@@ -1,7 +1,7 @@
 import fenwick_tree
 # This file is used as a playground file to test the FenwickTree class it does not test the library 
 
-fenwick_tree = fenwick_tree.FenwickTree([1,2,3,4,5])
+fenwick_tree = fenwick_tree.FenwickTree([4,8,5,2,6,1,0,8])
 
 print(fenwick_tree.get_tree())
 
