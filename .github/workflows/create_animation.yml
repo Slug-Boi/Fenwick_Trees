@@ -26,7 +26,9 @@ jobs:
         activate-environment: fenwick_manim
         environment-file: environment.yml
         auto-activate-base: false
+    - name: Create Animation
       run: |
+        conda activate fenwick_manim
         cd manim/$MANIM_FOLDER
         manim -pqh *.py $MANIM_SCENE
         tar -czf media.tar.gz media
