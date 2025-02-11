@@ -216,6 +216,8 @@ class Test(Scene):
 
 
         # QUERY PART
+
+        self.play(startArray.animate.shift(RIGHT*2)) # Make room for text
         queryText = Text("")
         lines = []
         #self.play(Write(queryText))
@@ -267,8 +269,7 @@ class Test(Scene):
         """
         updateText = (
             Text("Update(2, 3)")
-            .to_edge(UP)
-            .to_edge(LEFT)
+            .to_edge(UP*2+RIGHT*-0.1)
         )
         self.play(Write(updateText))
 
