@@ -75,7 +75,7 @@ impl FenwickTree {
     #[new]
     fn new(input: Vec<i32>) -> Self {
         let size = input.len() as i32;
-        let mut tree = vec![0; size as usize + 1];
+        let mut tree = vec![0; size as usize];
         tree.insert(0, -9999); // Placeholder value to make the tree 1 indexed
         let mut fenwick_tree = FenwickTree { tree, size };
         for x in 0..size {
@@ -95,7 +95,7 @@ impl FenwickTree {
             .collect();
 
     let size = input.len() as i32;
-    let mut tree = vec![0; size as usize + 1];
+    let mut tree = vec![0; size as usize];
     tree.insert(0, -9999); // Placeholder value to make the tree 1 indexed
     let mut fenwick_tree = FenwickTree { tree, size };
     for x in 0..size {
