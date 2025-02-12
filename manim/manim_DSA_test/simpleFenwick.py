@@ -31,6 +31,10 @@ def updateArrayValue(array: MArray, index: int, newValue: int) -> Text:
     )
     return newIndex
 
+def highlight_box(box: Square, color: str = PINK):
+    return box.animate.set_fill(color, opacity=1)
+    
+
 def updateBoxValue(text: Text, newValue: int) -> Text:
     newText = (
         Text(str(int(text.text)+newValue),
@@ -84,12 +88,19 @@ class Test(Scene):
         plus = plus_sign(0, boxes)
         self.play(Write(plus),
                   startArray[0].animate.highlight(stroke_color=PINK),
-                  startArray[1].animate.highlight(stroke_color=PINK)
+                  startArray[1].animate.highlight(stroke_color=PINK),
+                  *[highlight_box(boxes[i][0]) for i in range(2)]
                   )
+        
         self.wait(0.5)
-        self.play(Unwrite(plus))
+        self.play(Unwrite(plus),
+                  *[highlight_box(boxes[i][0], BLUE) for i in range(2)]
+                  )
+      
+
 
         self.moveNumBox(boxes[1], UP, UPLEVEL)
+
 
         sumBox1 = (
             Rectangle(height=1, width=2.27) # 2.27 is the width of 2 square with the gap
@@ -101,6 +112,8 @@ class Test(Scene):
         
         # integer = Integer(number=4).scale(1.8)
         # self.add(integer)
+
+                
 
         sumText = Text(str(fenwick_tree.sum(1)), stroke_width=3).move_to(sumBox1.get_center())
         self.play(
@@ -129,10 +142,14 @@ class Test(Scene):
         self.play(Write(plus),
                   Write(plus2),
                   startArray[2].animate.highlight(stroke_color=PINK),
-                  startArray[3].animate.highlight(stroke_color=PINK)
+                  startArray[3].animate.highlight(stroke_color=PINK),
+                  *[highlight_box(boxes[i][0]) for i in range(1,4)]
                   )
         self.wait(0.5)
-        self.play(Unwrite(plus), Unwrite(plus2))
+        self.play(Unwrite(plus), 
+                  Unwrite(plus2), 
+                  *[highlight_box(boxes[i][0], BLUE) for i in range(1,4)]
+                  )
 
         self.moveNumBox(boxes[3], UP, UPLEVEL*2)
 
@@ -163,10 +180,13 @@ class Test(Scene):
         plus = plus_sign(4, boxes)
         self.play(Write(plus),
                   startArray[4].animate.highlight(stroke_color=PINK),
-                  startArray[5].animate.highlight(stroke_color=PINK)
+                  startArray[5].animate.highlight(stroke_color=PINK),
+                  *[highlight_box(boxes[i][0]) for i in range(4,6)]
                   )
         self.wait(0.5)
-        self.play(Unwrite(plus))
+        self.play(Unwrite(plus),
+                  *[highlight_box(boxes[i][0], BLUE) for i in range(4,6)]
+                  )
 
         self.moveNumBox(boxes[5], UP, UPLEVEL)
         
@@ -196,10 +216,15 @@ class Test(Scene):
                   startArray[2].animate.highlight(stroke_color=PINK),
                   startArray[3].animate.highlight(stroke_color=PINK),
                   startArray[6].animate.highlight(stroke_color=PINK),
-                  startArray[7].animate.highlight(stroke_color=PINK)
+                  startArray[7].animate.highlight(stroke_color=PINK),
+                  highlight_box(boxes[3][0]),
+                  highlight_box(boxes[5][0]),
+                  highlight_box(boxes[-1][0]),
                   )
         self.wait(0.5)
-        self.play(Unwrite(plus), Unwrite(plus2), Unwrite(plus3))
+        self.play(Unwrite(plus), Unwrite(plus2), Unwrite(plus3),
+                  *[highlight_box(boxes[i][0], BLUE) for i in range(0,8)]
+                  )
 
         self.moveNumBox(boxes[7], UP, UPLEVEL*3)
 
