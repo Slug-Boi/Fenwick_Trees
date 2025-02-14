@@ -1,7 +1,6 @@
 from manim import *
 from manim_dsa import *
 from fenwick_tree import FenwickTree
-from copy import deepcopy
 
 
 def plus_sign(boxnum, boxes):
@@ -66,24 +65,28 @@ class Test(Scene):
         # Using groups to draw using lag ratio delete after
         box_group = VGroup()
         text_group = VGroup()
+        index_group = VGroup()
         
         boxes = []
-        for num in array:
+        for i, num in enumerate(array):
             box = Square(1).set_fill(BLUE, opacity=1)
             numText = (Text(str(num), stroke_width=3))
+            indexText = Text(str(i+1), color=BLUE, font_size=25)
 
             boxes.append((box, numText))
             box_group.add(box)
             text_group.add(numText)
+            index_group.add(indexText)
 
         # Aligning the boxes and text
         box_group.arrange()
         box_group.to_edge(DOWN)
         for i in range(len(boxes)):
-            boxes[i][1].move_to(boxes[i][0].get_center())        
+            boxes[i][1].move_to(boxes[i][0].get_center())
+            index_group[i].move_to(boxes[i][0].get_bottom()).shift(DOWN*0.27)
 
 
-        self.play(Create(box_group,lag_ratio=0.1), Write(text_group, lag_ratio=0.1))
+        self.play(Create(box_group,lag_ratio=0.1), Write(text_group, lag_ratio=0.1), Write(index_group, lag_ratio=0.1))
 
         plus = plus_sign(0, boxes)
         self.play(Write(plus),
@@ -97,10 +100,7 @@ class Test(Scene):
                   *[highlight_box(boxes[i][0], BLUE) for i in range(2)]
                   )
       
-
-
-        self.moveNumBox(boxes[1], UP, UPLEVEL)
-
+        self.moveNumBox(boxes[1], UP, UPLEVEL, index_group[1])
 
         sumBox1 = (
             Rectangle(height=1, width=2.27) # 2.27 is the width of 2 square with the gap
@@ -108,26 +108,14 @@ class Test(Scene):
             .to_edge(DOWN)
             .shift(UP*UPLEVEL)
             .set_fill(BLUE, opacity=1)
-        )
-        
-        # integer = Integer(number=4).scale(1.8)
-        # self.add(integer)
-
-                
+        )       
 
         sumText = Text(str(fenwick_tree.sum(1)), stroke_width=3).move_to(sumBox1.get_center())
         self.play(
             Transform(boxes[1][0], sumBox1), 
             FadeTransform(boxes[1][1], sumText, stretch=False),
-            #rate_func=linear,
-            # run_time=0.6
         )
         boxes[1] = (boxes[1][0], sumText)
-
-        # self.play(
-        #     startArray[0].animate.unhighlight(),
-        #     startArray[1].animate.unhighlight(),
-        # )
 
         sumBox2 = (
             Rectangle(height=1, width=2.27*2+0.23)
@@ -151,16 +139,12 @@ class Test(Scene):
                   *[highlight_box(boxes[i][0], BLUE) for i in range(1,4)]
                   )
 
-        self.moveNumBox(boxes[3], UP, UPLEVEL*2)
+        self.moveNumBox(boxes[3], UP, UPLEVEL*2, index_group[3])
 
         sumText = Text(str(fenwick_tree.sum(3)), stroke_width=3).move_to(sumBox2.get_center())
         self.play(
             Transform(boxes[3][0], sumBox2),
-            # FadeOut(boxes[3][1]),
-            # FadeIn(Text("19", stroke_width=3).move_to(newNewLevel.get_center()))
             FadeTransform(boxes[3][1], sumText, stretch=False),
-            # rate_func=linear,
-            # run_time=0.75
         )
         boxes[3] = (boxes[3][0], sumText)
 
@@ -188,7 +172,7 @@ class Test(Scene):
                   *[highlight_box(boxes[i][0], BLUE) for i in range(4,6)]
                   )
 
-        self.moveNumBox(boxes[5], UP, UPLEVEL)
+        self.moveNumBox(boxes[5], UP, UPLEVEL, index_group[5])
         
         sumText = Text(str(fenwick_tree.range_sum(4,5)), stroke_width=3).move_to(sumBox3.get_center())
         self.play(
@@ -226,7 +210,7 @@ class Test(Scene):
                   *[highlight_box(boxes[i][0], BLUE) for i in range(0,8)]
                   )
 
-        self.moveNumBox(boxes[7], UP, UPLEVEL*3)
+        self.moveNumBox(boxes[7], UP, UPLEVEL*3, index_group[7])
 
         sumText = Text(str(fenwick_tree.sum(7)), stroke_width=3).move_to(sumBox4.get_center())
         self.play(
@@ -239,16 +223,16 @@ class Test(Scene):
 
         self.play(*[i.animate.unhighlight() for i in startArray])
 
-
-        # QUERY PART
+        """
+        QUERY PART 
+        """
 
         self.play(startArray.animate.shift(RIGHT*2)) # Make room for text
         queryText = Text("")
+        resultText = Text("")
         lines = []
-        #self.play(Write(queryText))
         for i in range(array.__len__()):
-            queryText.become(Text(f"Query: SUM({i})").to_edge(UP*2+RIGHT*-0.1).scale(0.85))
-            # Find a prettier way of doing this
+            queryText.become(Text(f"Query: SUM({i})", font_size=44).to_edge(UP*1.2 + LEFT).shift(LEFT*0.24))
             self.play(Write(queryText))
             self.wait(0.5)
 
@@ -269,19 +253,32 @@ class Test(Scene):
                       Create(line))
             
             self.wait(0.5)
-
-            self.play(*[boxes[j-1][0].animate.set_fill(BLUE, opacity=1) for j in range(len(boxes))],
-                      *[boxes[j-1][0].animate.set_fill(PINK, opacity=1) for j in highlight_indices],
-                      )
+            numbers = [boxes[j-1][1].text for j in highlight_indices]
+            numbers.reverse()
+            resultText.become(Text("+".join(numbers), font_size=44))
+            resultText.align_to(queryText.get_bottom(), UP).align_to(queryText.get_left(), LEFT).shift(DOWN*0.2)
             
-            self.play(Unwrite(queryText))
+            self.play(
+                        *[boxes[j-1][0].animate.set_fill(BLUE, opacity=1) for j in range(len(boxes))],
+                        *[boxes[j-1][0].animate.set_fill(PINK, opacity=1) for j in highlight_indices],
+                        Write(resultText, lag_ration=0.2)
+                    )
+            self.wait(0.5)
+            resultSumText = Text("")
+            if len(numbers) > 1:
+                result = sum(map(int, numbers))
+                resultSumText.become(Text(f"= {result}", font_size=44).align_to(resultText.get_right(), LEFT).align_to(resultText.get_bottom(), DOWN).shift(RIGHT*0.27))
+            self.play(
+                Write(resultSumText)
+            )
+            self.wait(0.75)
+            self.play(Unwrite(queryText), Unwrite(resultText), Unwrite(resultSumText))
+            self.wait(0.3)
 
 
         for l in lines:
             self.remove(l)
-        # Plus 2 is magick number i have no clue
-        #self.play(*[i.animate.highlight(stroke_color=PINK) for i in startArray.submobjects[:query+2]])
-
+       
         # Query clean up
         self.play(
             *[i.animate.unhighlight() for i in startArray],
@@ -322,10 +319,11 @@ class Test(Scene):
         self.wait(0.3)
         self.play(Write(Text(newIndex.text, stroke_width=3).move_to(boxes[-1][0].get_center())))
 
-        self.wait(2)
+        self.wait(4)
     
-    def moveNumBox(self, box, direction, amount):
-        self.play(
-            box[0].animate.shift(direction*amount),
-            box[1].animate.shift(direction*amount)
-        )
+    def moveNumBox(self, box, direction, amount, index):
+        temp = VGroup()
+        temp.add(box[0])
+        temp.add(box[1])
+        animation = AnimationGroup(temp.animate.shift(direction*amount), index.animate.shift(direction*amount), lag_ratio=0.45)
+        self.play(animation)
