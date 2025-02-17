@@ -62,11 +62,15 @@ class FenwickTree_Tree(Scene):
 
         graph = {}
         label_dict = {}
+        position_dict = {}
         i = 0
         while i in level_map:
             for j in range(0,len(level_map[i]),2):
                 if i+1 not in level_map or not level_map[i+1][j//2:]:
-                    label_dict[str(level_map[i][j][1])] = str(level_map[i][j][0])
+                    key = str(level_map[i][j][1])
+                    graph[key] = graph.get(key, ([], Circle(0.5)))
+                    label_dict[key] = str(level_map[i][j][0])
+                    position_dict[key] = dsa_arr[level_map[i][j][1]-1].submobjects[0].get_center()
                     break
 
                 lvl_list = level_map[i]
@@ -75,14 +79,18 @@ class FenwickTree_Tree(Scene):
                     grab = 1
                 graph[str(level_map[i+1][j//2][1])] = ([str(x[1]) for x in lvl_list[j:grab+j]], Circle(0.5))
 
-                for k in range(grab):
-                    label_dict[str(lvl_list[k][1])] = str(lvl_list[k][0])
+                for index in lvl_list[j:grab+j]:
+                    graph[str(index[1])] = graph.get(str(index[1]), ([], Circle(0.5)))
+                    label_dict[str(index[1])] = str(index[0])
+                    position_dict[str(index[1])] = dsa_arr[index[1]-1].submobjects[0].get_center()
 
             i += 1
 
         print(graph)
-        mgraph = MGraphGeneric(graph, style=MGraphStyle.PURPLE, value_dict=label_dict)   
-            
+        mgraph = MGraphGeneric(graph, style=MGraphStyle.PURPLE, nodes_position=position_dict, value_dict=label_dict, edge_arrows=False)
+        self.play(FadeOut(dsa_arr))
+        self.play(Create(mgraph))
+        self.wait(3)
 
 
 
