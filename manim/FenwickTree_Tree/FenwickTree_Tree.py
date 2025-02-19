@@ -66,13 +66,13 @@ class FenwickTree_Tree(Scene):
         position_dict = {}
         self.wait(2)
 
-        print(dsa_arr.submobjects)
+        #print(dsa_arr.submobjects)
         #TODO figure out why channing the font size to 36 makes the text gap by like 5 pixels
 
         style = MGraphStyle.DEFAULT
 
-        style.node_label["font_size"] = 36
-
+        style.node_label["font_size"] = 48
+    
         for index, val in enumerate(dsa_arr.submobjects[1:-1]):
             graph[str(index+1)] = ([], val.submobjects[0].copy())
             # print(index)
@@ -80,12 +80,15 @@ class FenwickTree_Tree(Scene):
             label_dict[str(index+1)] = str(fta[index+1]).strip()
 
             position_dict[str(index+1)] = dsa_arr[index].submobjects[0].get_center()
-        mgraph = MGraphGeneric(graph, style=style, nodes_position=position_dict, value_dict=label_dict, edge_arrows=False)
-        
+        mgraph = MGraphGeneric(graph, style=style, nodes_position=position_dict, value_dict=label_dict, edge_arrows=False)      
+
+        # Scale the font to fit the marray text
+        for text in mgraph.submobjects:
+            text[1].scale(0.75)
+
         self.remove(dsa_arr)
         self.add(mgraph)
 
-        self.wait(5)
         anim_group = []
         i = 0
         while i in level_map:
