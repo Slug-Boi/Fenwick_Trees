@@ -101,8 +101,10 @@ class FenwickTree_Tree(Scene):
                 if len(lvl_list) == 1:
                     grab = 1
                 for e in range(grab):
-                    self.play(mgraph.animate.add_edge(str(level_map[i+1][j//2][1]), str(lvl_list[j+e][1])))
+                    anim_group.append(mgraph.animate.add_edge(str(level_map[i+1][j//2][1]), str(lvl_list[j+e][1])))
             i += 1
+
+        self.play(*anim_group)
 
         self.wait(3)
 
