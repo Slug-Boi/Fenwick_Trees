@@ -126,28 +126,52 @@ class FenwickTree_Tree(Scene):
         while updateIndex < len(fta):
             mathText = []
             leaf = tree_level(updateIndex) == 0
+            # Create mobjects for binary equation for finding next index in tree
             if leaf:
-                mathText.append(Text(f"{updateIndex-1} + 1 = {updateIndex} = {binary_index(updateIndex, 4)}").scale(0.75).move_to(updateText.get_left(), LEFT).shift(DOWN))
+                mathText.append(
+                    Text(f"{updateIndex-1} + 1 = {updateIndex} = {binary_index(updateIndex, 4)}")
+                    .scale(0.75)
+                    .move_to(updateText.get_left(), LEFT)
+                    .shift(DOWN)
+                )
             else:
-                indexText = Text(binary_index(prevIndex, 4)).scale(0.75).move_to(updateText.get_left(), LEFT).shift(DOWN+RIGHT*1.4)
-                mathText.append(indexText)
+                mathText.append(
+                    Text(binary_index(prevIndex, 4))
+                    .scale(0.75)
+                    .move_to(updateText.get_left(), LEFT)
+                    .shift(DOWN+RIGHT*1.4)
+                )
                 # lsbText = Text(f"+ lsb({binary_index(prevIndex, 4)})").scale(0.75).move_to(indexText.get_right(), RIGHT).shift(DOWN*0.6)
-                lsbText = Text(f"+ {binary_index(prevIndex & -prevIndex, 4)}").scale(0.75).move_to(indexText.get_right(), RIGHT).shift(DOWN*0.6)
-                mathText.append(lsbText)
-                mathLine = Line(lsbText.get_left()+DOWN*0.3, lsbText.get_right()+DOWN*0.3)
-                mathText.append(mathLine)
-                resultText = Text(binary_index(updateIndex, 4)).scale(0.75).move_to(mathLine.get_right(), RIGHT).shift(DOWN*0.3)
-                mathText.append(resultText)
+                mathText.append(
+                    Text(f"+ {binary_index(prevIndex & -prevIndex, 4)}")
+                    .scale(0.75)
+                    .move_to(mathText[-1].get_right(), RIGHT)
+                    .shift(DOWN*0.6)
+                )
+                mathText.append(
+                    Line(mathText[-1].get_left()+DOWN*0.3, mathText[-1].get_right()+DOWN*0.3)
+                )
+                mathText.append(
+                    Text(binary_index(updateIndex, 4))
+                    .scale(0.75)
+                    .move_to(mathText[-1].get_right(), RIGHT)
+                    .shift(DOWN*0.3)
+                )
             mathAnimation = AnimationGroup(*[Write(x) for x in mathText], lag_ratio=0.3)
             self.play(mathAnimation)
             self.wait(0.4)
+
+            # Highlight and change text in tree
             self.play(mgraph[str(updateIndex)].animate.highlight())
             Text.become(mgraph[str(updateIndex)].submobjects[1], Text(str(fw.get_tree()[updateIndex]), **style.node_label).scale(0.75).move_to(mgraph[str(updateIndex)].submobjects[1]))
             self.play(Write(mgraph[str(updateIndex)].submobjects[1]))
+            
+            # Prep for next loop
             self.play(*[Unwrite(x) for x in mathText])
             self.wait(0.3)
             prevIndex = updateIndex
             updateIndex += updateIndex & -updateIndex
+        
         self.play(Unwrite(updateText))
     
         self.wait(3)
