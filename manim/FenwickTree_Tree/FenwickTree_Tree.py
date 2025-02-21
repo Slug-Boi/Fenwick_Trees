@@ -109,5 +109,45 @@ class FenwickTree_Tree(Scene):
         self.wait(3)
 
 
-
-       
+        """
+        Update Tree Animation
+        """
+        updateIndex = 5
+        prevIndex = -1
+        updateBy = 3
+        fw.update(updateIndex-1, updateBy)
+        updateText = (
+            Text(f"Update({updateIndex-1}, {updateBy})")
+            .scale(0.75)
+            .to_edge(UP+LEFT)
+            .shift(LEFT*0.3)
+        )
+        self.play(Write(updateText))
+        while updateIndex < len(fta):
+            mathText = []
+            leaf = tree_level(updateIndex) == 0
+            if leaf:
+                mathText.append(Text(f"{updateIndex-1} + 1 = {updateIndex} = {binary_index(updateIndex, 4)}").scale(0.75).move_to(updateText.get_left(), LEFT).shift(DOWN))
+            else:
+                indexText = Text(binary_index(prevIndex, 4)).scale(0.75).move_to(updateText.get_left(), LEFT).shift(DOWN+RIGHT*1.4)
+                mathText.append(indexText)
+                # lsbText = Text(f"+ lsb({binary_index(prevIndex, 4)})").scale(0.75).move_to(indexText.get_right(), RIGHT).shift(DOWN*0.6)
+                lsbText = Text(f"+ {binary_index(prevIndex & -prevIndex, 4)}").scale(0.75).move_to(indexText.get_right(), RIGHT).shift(DOWN*0.6)
+                mathText.append(lsbText)
+                mathLine = Line(lsbText.get_left()+DOWN*0.3, lsbText.get_right()+DOWN*0.3)
+                mathText.append(mathLine)
+                resultText = Text(binary_index(updateIndex, 4)).scale(0.75).move_to(mathLine.get_right(), RIGHT).shift(DOWN*0.3)
+                mathText.append(resultText)
+            mathAnimation = AnimationGroup(*[Write(x) for x in mathText], lag_ratio=0.3)
+            self.play(mathAnimation)
+            self.wait(0.4)
+            self.play(mgraph[str(updateIndex)].animate.highlight())
+            Text.become(mgraph[str(updateIndex)].submobjects[1], Text(str(fw.get_tree()[updateIndex]), **style.node_label).scale(0.75).move_to(mgraph[str(updateIndex)].submobjects[1]))
+            self.play(Write(mgraph[str(updateIndex)].submobjects[1]))
+            self.play(*[Unwrite(x) for x in mathText])
+            self.wait(0.3)
+            prevIndex = updateIndex
+            updateIndex += updateIndex & -updateIndex
+        self.play(Unwrite(updateText))
+    
+        self.wait(3)
