@@ -105,9 +105,53 @@ class FenwickTree_Tree(Scene):
             i += 1
 
         self.play(*anim_group)
-
         self.wait(3)
 
+        # Query
 
+        queryText = Text("Query: Sum(0)").scale(0.75).to_corner(UL)
 
-       
+        prev_hightlights = []
+        for i in range(1, len(arr)+1):
+            queryText.become(Text("Query: Sum({})".format(i-1)).scale(0.75).to_corner(UL))
+            self.play(Write(queryText))
+            self.wait(1)
+
+            highlight_indices = []
+            z = i
+            while z > 0:
+                highlight_indices.append(z)
+                z -= -z & z
+
+            prevIndex = -1
+
+            edge_highlight = []
+            boxes_highlight = []
+
+            for index in highlight_indices:
+                boxes_highlight.append(mgraph[str(index)])
+                #print(mgraph)
+                #print(index, prevIndex)
+                if(str(index), str(prevIndex)) in mgraph:
+                    edge_highlight.append(mgraph[(str(index), str(prevIndex))])
+                #print(prevIndex)
+                #print(mgraph.edges)
+                # for edge in mgraph.edges:
+                #     if edge[0] == str(index) and edge[1] == str(prevIndex) or edge[1] == str(index) and edge[0] == str(prevIndex):
+                #         #print(edge)
+                #         mgraph[edge].animate.highlight(PINK)
+                prevIndex = index
+
+            
+
+            self.play(
+                *[box[0].animate.set_fill(BLUE) for _, box in mgraph.nodes.items() if box not in boxes_highlight],
+                *[box[0].animate.set_fill(PINK) for box in boxes_highlight], 
+                *[edge.animate.unhighlight() for edge in prev_hightlights if edge not in edge_highlight],
+                *[edge.animate.highlight(PINK) for edge in edge_highlight ]
+                )
+            prev_hightlights = edge_highlight
+            print(prev_hightlights)
+            self.wait(1)
+    
+        self.wait(2)
