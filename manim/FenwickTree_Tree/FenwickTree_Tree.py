@@ -13,6 +13,16 @@ def tree_level(index) -> int:
     return int(log2(lsb))
 
 class FenwickTree_Tree(Scene):
+    def resetPartialSums(self):
+        animGroup = AnimationGroup(FadeOut(self.results), self.bracket.animate.move_to(self.bin_text.get_right()+RIGHT*0.15, LEFT), lag_ratio=0.5)
+        self.play(animGroup)
+
+    def addToPartialSum(self) -> None:
+        self.results.arrange()
+        self.results.move_to(self.bin_text.get_right()+RIGHT*0.15, LEFT)
+        animGroup = AnimationGroup(self.bracket.animate.move_to(self.results[-1].get_right()+RIGHT*0.15, LEFT), FadeIn(self.results[-1]), lag_ratio=0.5)
+        self.play(animGroup)
+
     def construct(self):
         UPLEVEL = 2
 
@@ -67,7 +77,6 @@ class FenwickTree_Tree(Scene):
         self.wait(2)
 
         #print(dsa_arr.submobjects)
-        #TODO figure out why channing the font size to 36 makes the text gap by like 5 pixels
 
         style = MGraphStyle.DEFAULT
 
@@ -113,16 +122,69 @@ class FenwickTree_Tree(Scene):
 
         prev_hightlights = []
         prev_boxes = []
+        self.bin_text = Text("Partial sums = [").scale(0.6).move_to(queryText.get_left(),LEFT).shift(DOWN*0.5)
+        self.bracket = Text("]").scale(0.6).move_to(self.bin_text.get_right(), LEFT).shift(RIGHT*0.15)
+        # TODO add lag to writeing of bracket
+        self.play(Write(queryText), Write(self.bin_text), Write(self.bracket))
+        self.results = VGroup()
+
+        # gap = 0.1
+        # mathThing = Mobject()
+        # mathThing.add(Text("0000").scale(0.6))
+        # mathThing.add(Text("-0000").scale(0.6).move_to(mathThing.get_right(), RIGHT).shift(mathThing.submobjects[0].height*DOWN*gap))
+        # mathThing.add(Line(mathThing.get_left()+mathThing.height*DOWN*gap, mathThing.get_right()+mathThing.height*DOWN*gap))
+        # mathThing.add(Text("0000").scale(0.6).move_to(mathThing.get_right(), RIGHT).shift(DOWN*gap))
+        # mathThing.move_to(bin_text.get_bottom()+DOWN*0.3, UP)
+        # self.add(mathThing)
         for i in range(1, len(arr)+1):
-            queryText.become(Text("Query: Sum({})".format(i-1)).scale(0.75).to_corner(UL))
-            self.play(Write(queryText))
-            self.wait(1)
+            self.resetPartialSums()
+            self.results = VGroup()
+            if i != 1:
+                queryText.become(Text("Query: Sum({})".format(i-1)).scale(0.75).to_corner(UL))
+                self.play(Write(queryText))
+                self.wait(1)
 
             highlight_indices = []
             z = i
+            prev_z = -1
             while z > 0:
+                mathGroup = VGroup()
                 highlight_indices.append(z)
+                prev_z = z
                 z -= -z & z
+                if z > 0:
+                    if prev_z == i:
+                        startIndex = Text(binary_index(prev_z, 4)).scale(0.6).move_to(self.bin_text.get_bottom(), UP).shift(DOWN*0.3)
+                        self.results.add(startIndex)
+                        self.play(Write(startIndex))
+                        self.wait(1)
+                        self.play(FadeOut(startIndex))
+                        self.addToPartialSum()
+
+                    mathGroup.add(Text(binary_index(prev_z, 4)).scale(0.6))
+                    mathGroup.add(Text("- "  + binary_index(-prev_z & prev_z, 4)).scale(0.6))
+                    mathGroup.add(Line(mathGroup[1].get_left(), mathGroup[1].get_right()))
+                    mathGroup.add(Text(binary_index(z, 4)).scale(0.6))
+                    mathGroup.arrange(DOWN, center=False)
+                    mathGroup.move_to(self.bin_text.get_bottom(), UP).shift(DOWN*0.3)
+                    self.play(Write(mathGroup))
+                    self.wait(1)
+                    self.results.add(mathGroup[-1].copy())
+                    self.addToPartialSum()
+                    self.play(Unwrite(mathGroup))
+                elif len(highlight_indices) == 1:
+                    mathGroup.add(Text(binary_index(prev_z, 4)).scale(0.6))
+                    mathGroup.move_to(self.bin_text.get_bottom(), UP).shift(DOWN*0.3)
+                    self.play(Write(mathGroup))
+                    self.wait(1)
+                    self.results.add(mathGroup[-1].copy())
+                    self.addToPartialSum()
+                    self.play(FadeOut(mathGroup))
+
+            # Do binary math stuff (i'm stuff) :)
+            # self.results.add(Text(binary_index(highlight_indices[0], 4)).scale(0.6))
+            # if len(highlight_indices) > 1:
+
 
             prevIndex = -1
 
@@ -204,7 +266,7 @@ class FenwickTree_Tree(Scene):
             self.wait(0.4)
 
             # Highlight and change text in tree
-            self.play(mgraph[str(updateIndex)].animate.highlight())
+            self.play(mgraph[str(updateIndex)].animate.highlight(PINK))
             Text.become(mgraph[str(updateIndex)].submobjects[1], Text(str(fw.get_tree()[updateIndex]), **style.node_label).scale(0.75).move_to(mgraph[str(updateIndex)].submobjects[1]))
             self.play(Write(mgraph[str(updateIndex)].submobjects[1]))
             
