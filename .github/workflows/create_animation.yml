@@ -26,10 +26,16 @@ jobs:
         activate-environment: fenwick_manim
         environment-file: environment.yml
         auto-activate-base: false
-    - name: Create Animation
+    - name: Download custom module & Create Animation 
       run: |
         source $CONDA/etc/profile.d/conda.sh
         conda activate fenwick_manim
+        git clone https://github.com/Slug-Boi/manim-dsa.git
+        pip install uv
+        cd manim-dsa
+        uv build
+        pip install ./dist/manim_dsa-0.2.0.tar.gz
+        cd ..
         cd lib/fenwick_tree && maturin develop && cd ../..
         cd manim/$MANIM_FOLDER
         manim -pqh *.py $MANIM_SCENE
