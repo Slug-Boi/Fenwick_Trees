@@ -5,6 +5,8 @@ from math import log2, ceil
 from fenwick_tree import FenwickTree
 from copy import deepcopy
 
+global_font = "DejaVu Sans Condensed"
+
 def binary_index(index,b_len) -> str:
     return "{0:0{b_len}b}".format(index, b_len=b_len)
 
@@ -19,7 +21,7 @@ class FenwickTree_Tree(Scene):
 
     def addToPartialSum(self) -> None:
         if len(self.results) > 1:
-            self.results.insert(-1, Text(";").scale(0.6))
+            self.results.insert(-1, Text(";", font=global_font).scale(0.6))
 
         self.results.arrange(buff=0.18, aligned_edge=DOWN)
         self.results.move_to(self.bin_text.get_right()+RIGHT*0.15, LEFT)
@@ -42,8 +44,8 @@ class FenwickTree_Tree(Scene):
         fta = fw.get_tree()
         print(fta)
     
-        dsa_arr = MArray(arr, margin=1.25, style=MArrayStyle.BLUE).scale(0.75).to_edge(DOWN)
-        bin_indices = VGroup(*[Text(binary_index(i+1,binary_len), color=BLUE_B, weight=SEMIBOLD, stroke_width=1.2, stroke_color=BLUE_E).scale(0.5) for i in range(len(arr))])
+        dsa_arr = MArray(arr, margin=1.25, style=MArrayStyle.BLUE).scale(0.75).to_edge(DOWN).shift(UP*0.3)
+        bin_indices = VGroup(*[Text(binary_index(i+1,binary_len), color=BLUE_B, weight=NORMAL, stroke_width=1.2, stroke_color=BLUE_E, font=global_font).scale(0.5) for i in range(len(arr))])
 
         for i, bi in enumerate(bin_indices):
             bi.move_to(dsa_arr[i].get_center()).align_to(dsa_arr[i].get_bottom()+DOWN*0.1, UP)
@@ -75,6 +77,10 @@ class FenwickTree_Tree(Scene):
                         )
             if lvl > 0:
                 self.play(Write(dsa_arr[i].submobjects[1]))
+        
+        self.wait(0.5)
+        indexMoveGroup = AnimationGroup(*[index.animate.shift(DOWN*0.2) for i, index in enumerate(bin_indices) if tree_level(i+1) != 0],lag_ratio=0.15)
+        self.play(indexMoveGroup)
 
         graph = {}
         label_dict = {}
@@ -124,21 +130,21 @@ class FenwickTree_Tree(Scene):
         self.wait(3)
 
         # Query
-
-        queryText = Text("Query: Sum(0)").scale(0.75).to_corner(UL)
+        queryText = Text("Query: Sum(").scale(0.75).to_corner(UL)
+        queryParen = Text(")").scale(0.75).move_to(queryText.get_right()+RIGHT*0.42, LEFT).align_to(queryText.get_top(), UP)
 
         self.bin_text = Text("Partial sums = [").scale(0.6).move_to(queryText.get_left(),LEFT).shift(DOWN*0.5)
         self.bracket = Text("]").scale(0.6).move_to(self.bin_text.get_right(), LEFT).shift(RIGHT*0.15)
-        self.play(Write(queryText), AnimationGroup(Write(self.bin_text), Write(self.bracket), lag_ratio=0.3))
+        self.play(AnimationGroup(Write(queryText), Write(queryParen), lag_ratio=0.3), AnimationGroup(Write(self.bin_text), Write(self.bracket), lag_ratio=0.3))
         
         edge_highlight = []
         boxes_highlight = []
         for i in range(1, len(arr)+1):
             self.results = VGroup()
-            if i != 1:
-                queryText.become(Text("Query: Sum({})".format(i-1)).scale(0.75).to_corner(UL))
-                self.play(Write(queryText))
-                self.wait(1)
+            
+            sum_index = Text("{}".format(i-1)).scale(0.75).move_to(queryText.get_right()+RIGHT*0.1, LEFT).align_to(queryParen.get_center(), ORIGIN)
+            self.play(Write(sum_index), queryParen.animate.align_to(sum_index.get_right()+RIGHT*0.1, LEFT))
+            self.wait(1)
 
             highlight_indices = []
             z = i
@@ -151,7 +157,7 @@ class FenwickTree_Tree(Scene):
                 if z > 0:
                     if prev_z == i:
                         startIndex = (
-                            Text(binary_index(prev_z, 4))
+                            Text(binary_index(prev_z, 4), font=global_font)
                             .scale(0.6)
                             .move_to(self.bin_text.get_bottom(), UP)
                             .shift(DOWN*0.3)
@@ -167,12 +173,12 @@ class FenwickTree_Tree(Scene):
                         self.play(FadeOut(startIndex), self.results.animate.set_color(WHITE))
 
                     mathGroup.add(
-                        Text(binary_index(prev_z, 4)).scale(0.6),
-                        Text("- "  + binary_index(-prev_z & prev_z, 4)).scale(0.6),
+                        Text(binary_index(prev_z, 4),font=global_font).scale(0.6),
+                        Text("- "  + binary_index(-prev_z & prev_z, 4),font=global_font).scale(0.6),
                     )
                     mathGroup.add(
                         Line(mathGroup[1].get_left(), mathGroup[1].get_right()),
-                        Text(binary_index(z, 4)).scale(0.6)
+                        Text(binary_index(z, 4),font=global_font).scale(0.6)
                     )
                     mathGroup.arrange(DOWN, center=False, aligned_edge=RIGHT)
                     mathGroup.move_to(self.bin_text.get_bottom(), UP).shift(DOWN*0.3)
@@ -187,7 +193,7 @@ class FenwickTree_Tree(Scene):
                     self.wait(1)
                     self.play(FadeOut(mathGroup), self.results[-1].animate.set_color(WHITE))
                 elif len(highlight_indices) == 1:
-                    mathGroup.add(Text(binary_index(prev_z, 4)).scale(0.6))
+                    mathGroup.add(Text(binary_index(prev_z, 4),font=global_font).scale(0.6))
                     mathGroup.move_to(self.bin_text.get_bottom(), UP).shift(DOWN*0.3)
 
                     self.play(Write(mathGroup))
@@ -211,20 +217,22 @@ class FenwickTree_Tree(Scene):
                     edge_highlight.append(mgraph[(str(index), str(prevIndex))])
                 prevIndex = index
 
-            
-
             self.play(
                 *[box.animate.highlight(PINK) for box in boxes_highlight], 
                 *[edge.animate.highlight(PINK) for edge in edge_highlight ]
                 )
             self.wait(1)
             if boxes_highlight:
-                self.play(*[box.animate.unhighlight() for box in boxes_highlight], *[edge.animate.unhighlight() for edge in edge_highlight])
+                self.play(*[box.animate.unhighlight() for box in boxes_highlight], *[edge.animate.unhighlight() for edge in edge_highlight],Unwrite(sum_index))
             self.resetPartialSums()
 
         self.wait(2)
 
-        self.play(Unwrite(queryText), mgraph.nodes[str(len(fta)-1)][0].animate.set_fill(BLUE), AnimationGroup(Unwrite(self.bracket), Unwrite(self.bin_text), lag_ratio=0.3))
+        self.play(Unwrite(queryText), 
+                  mgraph.nodes[str(len(fta)-1)][0].animate.set_fill(BLUE), 
+                  AnimationGroup(Unwrite(self.bracket), Unwrite(self.bin_text), lag_ratio=0.3),
+                  AnimationGroup(Unwrite(queryParen),Unwrite(sum_index,queryText),lag_ratio=0.1)
+                  )
 
         """
         Update Tree Animation
@@ -247,21 +255,21 @@ class FenwickTree_Tree(Scene):
             # Create mobjects for binary equation for finding next index in tree
             if leaf:
                 mathText.append(
-                    Text(f"{updateIndex-1} + 1 = {updateIndex} = {binary_index(updateIndex, 4)}")
+                    Text(f"{updateIndex-1} + 1 = {updateIndex} = {binary_index(updateIndex, 4)}", font=global_font)
                     .scale(0.6)
                     .move_to(updateText.get_left(), LEFT)
                     .shift(DOWN)
                 )
             else:
                 mathText.append(
-                    Text(binary_index(prevIndex, 4))
+                    Text(binary_index(prevIndex, 4),font=global_font)
                     .scale(0.6)
                     .move_to(updateText.get_left(), LEFT)
                     .shift(DOWN+RIGHT*1.4)
                 )
                 # lsbText = Text(f"+ lsb({binary_index(prevIndex, 4)})").scale(0.75).move_to(indexText.get_right(), RIGHT).shift(DOWN*0.6)
                 mathText.append(
-                    Text(f"+ {binary_index(prevIndex & -prevIndex, 4)}")
+                    Text(f"+ {binary_index(prevIndex & -prevIndex, 4)}",font=global_font)
                     .scale(0.6)
                     .move_to(mathText[-1].get_right(), RIGHT)
                     .shift(DOWN*0.6)
@@ -270,7 +278,7 @@ class FenwickTree_Tree(Scene):
                     Line(mathText[-1].get_left()+DOWN*0.3, mathText[-1].get_right()+DOWN*0.3)
                 )
                 mathText.append(
-                    Text(binary_index(updateIndex, 4))
+                    Text(binary_index(updateIndex, 4), font=global_font)
                     .scale(0.6)
                     .move_to(mathText[-1].get_right(), RIGHT)
                     .shift(DOWN*0.3)
