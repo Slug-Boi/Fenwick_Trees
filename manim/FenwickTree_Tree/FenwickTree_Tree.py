@@ -163,7 +163,7 @@ class FenwickTree_Tree(Scene):
                             .shift(DOWN*0.3)
                         )
                         self.results.add(startIndex.copy().set_color(PINK))
-
+                        self.wait(0.5)
                         self.play(Write(startIndex))
                         self.wait(1)
                         self.play(startIndex.animate.set_color(PINK))
