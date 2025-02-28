@@ -318,8 +318,180 @@ class Test(Scene):
         newIndex = updateBoxValue(boxes[-1][1], 3)
         self.wait(0.3)
         self.play(Write(Text(newIndex.text, stroke_width=3).move_to(boxes[-1][0].get_center())))
+        self.wait(2)
+        self.play(
+            Unwrite(updateText),
+            startArray[2].animate.unhighlight(),
+            boxes[2][0].animate.set_fill(BLUE),
+            boxes[3][0].animate.set_fill(BLUE),
+            boxes[-1][0].animate.set_fill(BLUE),
+        ) # Clean up
+        self.wait(1)
 
-        self.wait(4)
+        """
+        Range Query
+        """
+        startRange = 3
+        endRange = 6
+        rangeText = (
+            Text(f"Range query({startRange}, {endRange})")
+            .scale(0.75)
+            .to_corner(UL)
+            .shift(LEFT*0.2)
+        )
+        self.play(Write(rangeText))
+
+        # End query
+        endQueryText = (
+            Text(f"Query: Sum({endRange})")
+            .scale(0.6)
+            .move_to(rangeText.get_left(), LEFT)
+            .shift(DOWN*0.6)
+        )
+        self.play(Write(endQueryText))
+
+        highlight_indices = []
+        z = endRange + 1
+        while z > 0:
+            highlight_indices.append(z)
+            z -= -z & z
+        
+        self.play(
+            *[boxes[j-1][0].animate.set_fill(PINK, opacity=1) for j in highlight_indices],
+        )
+
+        endResultEqual = (
+            Text("=")
+            .scale(0.6)
+            .move_to(endQueryText.get_right(), LEFT)
+            .shift(RIGHT*0.2+UP*0.03)
+        )
+
+        endResultText = (
+            Text(f"{fenwick_tree.sum(endRange)}")
+            .scale(0.6)
+            .move_to(endResultEqual.get_right(), LEFT)
+            .shift(RIGHT*0.2+UP*0.03)
+        )
+        self.play(
+            AnimationGroup(
+                Write(endResultEqual),
+                Write(endResultText),
+                lag_ratio=0.3
+            )
+        )
+        
+        self.play(
+            *[boxes[j-1][0].animate.set_fill(BLUE, opacity=1) for j in range(len(boxes))],
+        )
+        self.wait(1)
+
+        # Start query
+        startQueryText = (
+            Text(f"Query: Sum({startRange})")
+            .scale(0.6)
+            .move_to(endQueryText.get_left(), LEFT)
+            .shift(DOWN*0.5)
+        )
+        self.play(Write(startQueryText))
+
+        highlight_indices = []
+        z = startRange + 1
+        while z > 0:
+            highlight_indices.append(z)
+            z -= -z & z
+        
+        self.play(
+            *[boxes[j-1][0].animate.set_fill(PINK, opacity=1) for j in highlight_indices],
+        )
+
+        startResultEqual = (
+            Text("=")
+            .scale(0.6)
+            .move_to(startQueryText.get_right(), LEFT)
+            .shift(RIGHT*0.2+UP*0.03)
+        )
+
+        startResultText = (
+            Text(f"{fenwick_tree.sum(startRange)}")
+            .scale(0.6)
+            .move_to(startResultEqual.get_right(), LEFT)
+            .shift(RIGHT*0.2)
+        )
+        self.play(
+            AnimationGroup(
+                Write(startResultEqual),
+                Write(startResultText),
+                lag_ratio=0.2
+            )
+        )
+
+        self.play(
+            *[boxes[j-1][0].animate.set_fill(BLUE, opacity=1) for j in range(len(boxes))],
+        )
+        self.wait(1)
+
+        # Calculate Result
+        self.play(
+            FadeOut(endQueryText),
+            FadeOut(endResultEqual),
+            FadeOut(startQueryText),
+            FadeOut(startResultEqual),
+        )
+        self.play(
+            startResultText.animate.shift(LEFT*2.5),
+            endResultText.animate.shift(LEFT*2.5)
+        )
+
+        minusText = (
+            Text("-")
+            .scale(0.6)
+            .move_to(startResultText.get_left()+LEFT*0.1, RIGHT)
+        )
+        mathLine = (
+            Line(startResultText.get_left()+LEFT*0.3, startResultText.get_right())
+            .shift(DOWN*0.3)
+        )
+        self.wait(0.5)
+        self.play(
+            FadeIn(minusText),
+            FadeIn(mathLine)
+        )
+
+        sumText = (
+            Text(str(fenwick_tree.sum(endRange) - fenwick_tree.sum(startRange)))
+            .scale(0.6)
+            .move_to(startResultText.get_right(), RIGHT)
+            .shift(DOWN*0.6)
+        )
+        self.play(Write(sumText))
+        self.wait(1)
+
+        # Final result
+        rangeResultText = (
+            Text(f"= {fenwick_tree.sum(endRange) - fenwick_tree.sum(startRange)}")
+            .scale(0.75)
+            .move_to(rangeText.get_right(), LEFT)
+            .shift(RIGHT*0.28+UP*0.04)
+        )
+        self.play(
+            Write(rangeResultText), 
+            FadeOut(endResultText),
+            FadeOut(startResultText),
+            FadeOut(mathLine),
+            FadeOut(sumText),
+            FadeOut(minusText)
+        )
+        self.wait(2)
+        self.play(
+            AnimationGroup(
+                Unwrite(rangeResultText),
+                Unwrite(rangeText),
+                lag_ratio=0.5
+            )
+        )
+
+        self.wait(3)
     
     def moveNumBox(self, box, direction, amount, index):
         temp = VGroup()
