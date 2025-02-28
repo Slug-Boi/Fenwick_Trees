@@ -300,5 +300,126 @@ class FenwickTree_Tree(Scene):
             updateIndex += updateIndex & -updateIndex
         
         self.play(Unwrite(updateText), *[mgraph[str(node)].animate.unhighlight() for node in highlights])
+
+        """
+        Range Query
+        """
+        
+        startRange = 3
+        endRange = 6
+        rangeText = (
+            Text(f"Range Query({startRange}, {endRange})")
+            .scale(0.75)
+            .to_edge(UP+LEFT)
+            .shift(LEFT*0.3)
+        )
+        self.play(Write(rangeText))
+
+        # End query
+        endQueryText = (
+            Text(f"Query: Sum({endRange})")
+            .scale(0.6)
+            .move_to(rangeText.get_left(), LEFT)
+            .shift(DOWN*0.6)
+        )
+        self.play(Write(endQueryText))
+
+        highlight_indices = []
+        z = endRange+1 # Adjust for 1 index
+        while z > 0:
+            highlight_indices.append(z)
+            z -= z & -z
     
+        edge_highlight = []
+        boxes_highlight = []
+
+        for index in highlight_indices:
+            boxes_highlight.append(mgraph[str(index)])
+            if(str(index), str(prevIndex)) in mgraph:
+                edge_highlight.append(mgraph[(str(index), str(prevIndex))])
+            prevIndex = index
+
+        self.play(
+            *[box.animate.highlight(PINK) for box in boxes_highlight], 
+            *[edge.animate.highlight(PINK) for edge in edge_highlight ]
+        )
+
+        endResultText = (
+            Text(f"= {fw.sum(endRange)}")
+            .scale(0.6)
+            .move_to(endQueryText.get_right(), LEFT)
+            .shift(RIGHT*0.2+UP*0.03)
+        )
+        self.play(Write(endResultText))
+        self.play(
+            *[box.animate.unhighlight() for box in boxes_highlight], 
+            *[edge.animate.unhighlight() for edge in edge_highlight ]
+        )
+        self.wait(1)
+        
+        # Start qurey
+        startQueryText = (
+            Text(f"Query: Sum({startRange})")
+            .scale(0.6)
+            .move_to(endQueryText.get_left(), LEFT)
+            .shift(DOWN*0.5)
+        )
+        self.play(Write(startQueryText))
+    
+        highlight_indices = []
+        z = startRange+1 # Adjust for 1 index
+        while z > 0:
+            highlight_indices.append(z)
+            z -= z & -z
+    
+        edge_highlight = []
+        boxes_highlight = []
+
+        for index in highlight_indices:
+            boxes_highlight.append(mgraph[str(index)])
+            if(str(index), str(prevIndex)) in mgraph:
+                edge_highlight.append(mgraph[(str(index), str(prevIndex))])
+            prevIndex = index
+
+        self.play(
+            *[box.animate.highlight(PINK) for box in boxes_highlight], 
+            *[edge.animate.highlight(PINK) for edge in edge_highlight ]
+        )
+
+        startResultText = (
+            Text(f"= {fw.sum(startRange)}")
+            .scale(0.6)
+            .move_to(startQueryText.get_right(), LEFT)
+            .shift(RIGHT*0.2+UP*0.03)
+        )
+        self.play(Write(startResultText))
+        self.play(
+            *[box.animate.unhighlight() for box in boxes_highlight], 
+            *[edge.animate.unhighlight() for edge in edge_highlight ]
+        )
+        self.wait(1)
+        
+        # Final result
+        rangeResultText = (
+            Text(f"= {fw.sum(endRange)} - {fw.sum(startRange)} = {fw.sum(endRange) - fw.sum(startRange)}")
+            .scale(0.75)
+            .move_to(rangeText.get_right(), LEFT)
+            .shift(RIGHT*0.28+UP*0.04)
+        )
+        self.play(
+            Write(rangeResultText), 
+            FadeOut(endQueryText),
+            FadeOut(endResultText),
+            FadeOut(startQueryText),
+            FadeOut(startResultText)
+        )
+        self.wait(2)
+        self.play(
+            AnimationGroup(
+                Unwrite(rangeResultText), 
+                Unwrite(rangeText), 
+                lag_ratio=0.6
+            )
+        )
+
         self.wait(3)
