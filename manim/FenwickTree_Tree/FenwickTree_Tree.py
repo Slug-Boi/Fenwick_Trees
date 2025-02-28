@@ -6,6 +6,27 @@ from fenwick_tree import FenwickTree
 from copy import deepcopy
 
 global_font = "DejaVu Sans Condensed"
+arr = [3, 2, -3, 6, 5, 4, -2, 7]
+
+# TODO: Move this out into a utils module
+def plus_sign(boxnum, boxes, gap=0.135, up_gap=0.135):
+    plus = Text("+", stroke_width=3)
+    plus.z_index = 1
+    box = boxes[boxnum][0]
+    print(boxnum, len(arr)-1)
+    if len(arr)-1 >= boxnum+1:
+        box2 = boxes[boxnum+1][0]
+        plus.move_to(box.get_center()+RIGHT*((box2.get_center()[0]-box.get_center()[0])/2)+UP*(box.height/2+up_gap))
+    else:
+        plus.move_to(box.get_center()+RIGHT*((box.width/2)+gap)+UP*(box.height/2+up_gap))
+    return plus
+
+# TODO: add a 2 box input method which takes the distance between their centers
+def plus_sign_manual(box, elevate, gap=0.135, up_gap=0):
+    plus = Text("+", stroke_width=3)
+    plus.z_index = 1
+    plus.move_to(box.get_center()+RIGHT*(box.width/2+gap)+UP*elevate*up_gap)
+    return plus
 
 def binary_index(index,b_len) -> str:
     return "{0:0{b_len}b}".format(index, b_len=b_len)
@@ -35,7 +56,6 @@ class FenwickTree_Tree(Scene):
         UPLEVEL = 2
 
         # Create a Fenwick Tree
-        arr = [3, 2, -3, 6, 5, 4, -2, 7]
         binary_len = ceil(log2(len(arr)+1))
 
         # fenwick tree
@@ -47,6 +67,9 @@ class FenwickTree_Tree(Scene):
         dsa_arr = MArray(arr, margin=1.25, style=MArrayStyle.BLUE).scale(0.75).to_edge(DOWN).shift(UP*0.3)
         bin_indices = VGroup(*[Text(binary_index(i+1,binary_len), color=BLUE_B, weight=NORMAL, stroke_width=1.2, stroke_color=BLUE_E, font=global_font).scale(0.5) for i in range(len(arr))])
 
+        # Distance between two indices in th array
+        box_distance = dsa_arr.submobjects[1].get_center()-dsa_arr.submobjects[0].get_center()
+
         for i, bi in enumerate(bin_indices):
             bi.move_to(dsa_arr[i].get_center()).align_to(dsa_arr[i].get_bottom()+DOWN*0.1, UP)
 
@@ -56,7 +79,9 @@ class FenwickTree_Tree(Scene):
         level_map = {}
 
         #TODO change to range
-        for i, _ in enumerate(arr):
+        for i in range(len(arr)):
+            pluses = []
+
             index = i+1
             lvl = tree_level(index)
             if lvl not in level_map:
@@ -64,6 +89,18 @@ class FenwickTree_Tree(Scene):
                 level_map[lvl].append((fta[index],index))
             else:
                 level_map[lvl].append((fta[index],index))
+
+            if lvl > 0:
+                z = i
+                #pluses.append(plus_sign(i-1, dsa_arr, 0.5,0.2))
+                while z > 0:
+                    if tree_level(z) < lvl:
+                        pluses.append(plus_sign_manual(dsa_arr[z-1], tree_level(z)-1, box_distance+0.5))
+                    z -= -z & z
+
+                if pluses:
+                        self.play(*[Write(plus) for plus in pluses])
+                        self.wait(0.5)
 
             anim_group = AnimationGroup(dsa_arr[i].animate.shift(UP*UPLEVEL*lvl), bin_indices[i].animate.shift(UP*UPLEVEL*lvl), lag_ratio=0.025)
             self.play(anim_group)
@@ -77,6 +114,10 @@ class FenwickTree_Tree(Scene):
                         )
             if lvl > 0:
                 self.play(Write(dsa_arr[i].submobjects[1]))
+            
+            if pluses:
+                self.play(*[Unwrite(plus) for plus in pluses])
+            
         
         self.wait(0.5)
         indexMoveGroup = AnimationGroup(*[index.animate.shift(DOWN*0.2) for i, index in enumerate(bin_indices) if tree_level(i+1) != 0],lag_ratio=0.15)
