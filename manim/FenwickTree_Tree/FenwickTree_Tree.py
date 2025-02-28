@@ -9,16 +9,12 @@ global_font = "DejaVu Sans Condensed"
 arr = [3, 2, -3, 6, 5, 4, -2, 7]
 
 # TODO: Move this out into a utils module
-def plus_sign(boxnum, boxes, gap=0.135, up_gap=0.135):
+def plus_sign_edge(edge, up_gap=0):
     plus = Text("+", stroke_width=3)
     plus.z_index = 1
-    box = boxes[boxnum][0]
-    print(boxnum, len(arr)-1)
-    if len(arr)-1 >= boxnum+1:
-        box2 = boxes[boxnum+1][0]
-        plus.move_to(box.get_center()+RIGHT*((box2.get_center()[0]-box.get_center()[0])/2)+UP*(box.height/2+up_gap))
-    else:
-        plus.move_to(box.get_center()+RIGHT*((box.width/2)+gap)+UP*(box.height/2+up_gap))
+    edge_cen = edge.get_center()
+    edge_height = edge.get_height()/4
+    plus.move_to(edge_cen).shift(UP*edge_height)
     return plus
 
 # TODO: add a 2 box input method which takes the distance between their centers
@@ -251,20 +247,27 @@ class FenwickTree_Tree(Scene):
 
             edge_highlight = []
             boxes_highlight = []
+            plus_edge_highlight = []
 
             for index in highlight_indices:
                 boxes_highlight.append(mgraph[str(index)])
                 if(str(index), str(prevIndex)) in mgraph:
                     edge_highlight.append(mgraph[(str(index), str(prevIndex))])
+                    plus_edge_highlight.append(plus_sign_edge(mgraph[(str(index), str(prevIndex))]))
                 prevIndex = index
 
             self.play(
                 *[box.animate.highlight(PINK) for box in boxes_highlight], 
-                *[edge.animate.highlight(PINK) for edge in edge_highlight ]
+                *[edge.animate.highlight(PINK) for edge in edge_highlight],
+                *[Write(plus) for plus in plus_edge_highlight]
                 )
             self.wait(1)
             if boxes_highlight:
-                self.play(*[box.animate.unhighlight() for box in boxes_highlight], *[edge.animate.unhighlight() for edge in edge_highlight],Unwrite(sum_index))
+                self.play(*[box.animate.unhighlight() for box in boxes_highlight],
+                           *[edge.animate.unhighlight() for edge in edge_highlight],
+                           *[Unwrite(plus) for plus in plus_edge_highlight],
+                           Unwrite(sum_index)
+                           )
             self.resetPartialSums()
 
         self.wait(2)
@@ -420,6 +423,7 @@ class FenwickTree_Tree(Scene):
             boxes_highlight.append(mgraph[str(index)])
             if(str(index), str(prevIndex)) in mgraph:
                 edge_highlight.append(mgraph[(str(index), str(prevIndex))])
+
             prevIndex = index
 
         self.play(
