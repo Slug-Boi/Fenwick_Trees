@@ -1,4 +1,4 @@
-use pyo3::{ffi::PyNumberMethods, prelude::*, types::{PyInt, PyList, PyString}};
+use pyo3::{prelude::*, types::PyString};
 use std::fs;
 use std::io::prelude::*;
 use rayon::{option, prelude::*, string};
