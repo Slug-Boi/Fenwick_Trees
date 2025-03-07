@@ -169,33 +169,22 @@ struct NdFenwick {
     size: Vec<i32>
 }
 
+fn create_empty_bit<T: Clone + Default>(dim: i32, inp: Vec<T>) -> Vec<T> {
+    if dim == 1 {
+        return vec![T::default(); inp.len()];
+    }
+    let mut bit = Vec::new();
+    for _ in 0..inp.len() {
+        bit.push(create_empty_bit(dim - 1, inp.clone()));
+    }
+    bit.concat()
+}
+
 #[pymethods]
 impl NdFenwick {
     
     // takes a python list as input and checks if its a i32 or a list
-    fn create_empty_bit(&self, dim: i32, inp: Bound<'_,PyList>) -> Vec<PyObject> {
-        Python::with_gil(|py| {
-            if dim == 1 {
-                // return the all 0 vec
-                return (0..inp.len()).map(|_| 0.into_py(py)).collect();
-            }
-            let mut bit = Vec::new();
-            for i in 0..inp.len() {
-                let val = inp.get_item(i);
-                match val {
-                    Ok(val) => {
-                        if val.is_instance_of::<PyList>() {
-                            bit.extend(self.create_empty_bit(dim-1, val.downcast::<PyList>().unwrap().clone()));
-                        } 
-                    }
-                    Err(e) => {
-                        println!("Error: {}", e);
-                    }
-                }
-            }
-            bit.into_iter().map(|x| x.into_py(py)).collect::<Vec<PyObject>>()
-        })
-    }
+    
 
     fn FillTree(&mut self, inp: Bound<'_, PyList>, dim: i32, position: Bound<'_, PyList>) {
         Python::with_gil(|py| {
@@ -239,16 +228,23 @@ impl NdFenwick {
 
     #[new]
     fn new(input: Bound<'_, PyList>, dim: i32) -> Self {
-        let mut size = Vec::new();
-        size.push(input.len() as i32);
-        let mut instance = NdFenwick { tree: Vec::new(), dim, size: Vec::new() };
-        instance.create_empty_bit(dim, input.clone());
-        Python::with_gil(|py| {
-            instance.FillTree(input, dim, PyList::empty(py));
+        // if dim is 1d collect as a vector of i32 else collect as a vector of PyObject
+        let inp: Vec<_> = Python::with_gil(|py| {
+            if dim == 1 {
+                input.iter().map(|x| x.extract::<i32>().unwrap()).collect()
+            } else {
+                input.iter().map(|x| x.into_py(py)).collect()
+            }
         });
+        let size = inp.len() as i32;
+        let tree = create_empty_bit(dim, size.clone())
+            .into_iter()
+            .map(|_| Python::with_gil(|py| 0.into_py(py)))
+            .collect();
 
-
-        return instance;
+        let mut nd_fenwick = NdFenwick { tree, dim, size };
+        
+        return nd_fenwick;
     }
 
     fn get_tree(&self) -> &Vec<PyObject> {
