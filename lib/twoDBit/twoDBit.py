@@ -14,12 +14,19 @@ class TwoDBIT:
             for i in range(len(matrix[0])):
                 aux[i][j] = matrix[(len(matrix)-1) - j][i]
         return aux
-
+    
     def Create(self):
         aux = self.startMatrix
         for row in range(self.matrix_size):
             for col in range(self.matrix_size):
                 self.Update(row, col, aux[row][col])
+
+    def CreatePositions(self) -> list:
+        operations = []
+        for row in range(self.matrix_size):
+            for col in range(self.matrix_size):
+                operations.append(((row, col), self.UpdatePositions(row, col, self.startMatrix[row][col])))
+        return operations
 
     def Update(self, x: int, y: int, val: int) -> None:
         x += 1
@@ -31,7 +38,7 @@ class TwoDBIT:
                 loop_y += (loop_y & -loop_y) # Add lsb to loop_y
             x += (x & -x) # Add lsb to x
     
-    def UpdatePositions(self, x: int, y: int, val: int) -> None:
+    def UpdatePositions(self, x: int, y: int, val: int) -> list:
         x += 1
         y += 1
         updateIndeces = []
