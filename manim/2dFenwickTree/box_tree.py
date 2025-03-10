@@ -69,9 +69,34 @@ class BoxTree(VGroup):
         lsb = index & -index
         return int(log2(lsb))
 
+    # def animate_create(self):
+    #     tree = FenwickTree(self.array)
+    #     animations = []
+    #     for i in range(len(self.array)):
+    #         level = self._tree_level(i+1)
+    #         boxWidth = self[0][0].get_width()*2**level + (2**level-1)*self.style["x_buffer"]
+    #         tempStyle = self.style["rect"].copy()
+    #         tempStyle["width"] = boxWidth
+    #         tempStyle["height"] = self[0][0].get_height()
+    #         newElement = (
+    #             TreeElement(Rectangle(
+    #                 **tempStyle
+    #                 ), 
+    #                 Text(str(tree.get_tree()[i+1]), **self.style["value"], fill_opacity=1 if self.show_values else 0)
+    #                 .scale(self.style["value_scale"])
+    #             )
+    #             .move_to(self[i][0].get_right(), RIGHT)
+    #             .shift(UP*self[0][0].get_height()*level + (UP*self.style["y_buffer"]*level))
+    #         )
+    #         if self.show_indices:
+    #             newElement += self[i][2]
+    #         domainExpansion = Transform(self[i], newElement)
+    #         animations.append(domainExpansion)
+
+    #     return animations
+    
     def create(self):
         tree = FenwickTree(self.array)
-        animations = []
         for i in range(len(self.array)):
             level = self._tree_level(i+1)
             boxWidth = self[0][0].get_width()*2**level + (2**level-1)*self.style["x_buffer"]
@@ -90,13 +115,10 @@ class BoxTree(VGroup):
             )
             if self.show_indices:
                 newElement += self[i][2]
-            domainExpansion = Transform(self[i], newElement)
-            animations.append(domainExpansion)
+            self[i].become(newElement)
 
-        return animations
+        return self
     
-    def hightlight(self, index):
-        pass
 
 # @override
 # def scale(self,n):
