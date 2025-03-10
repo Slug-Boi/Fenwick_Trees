@@ -9,12 +9,24 @@ class TreeElement(VGroup, Highlightable):
         super().__init__()
         self.rect = rect
         self._add_highlight(self.rect)
+        self.default_color = self.rect.color
+        self.default_stroke_color = self.rect.stroke_color
         self.value = value.move_to(self.rect)
         self += self.rect
         self += self.value
         if index:
             self.index = index.move_to(self.rect.get_bottom(), UP).shift(DOWN*0.1)
             self += self.index
+
+    def highlight(self, color=GREEN, stroke_color=BLUE_A):
+        self.rect.set_color(color)
+        self.rect.stroke_color = stroke_color
+        return self
+    
+    def unhighlight(self):
+        self.rect.set_color(self.default_color)
+        self.rect.stroke_color = self.default_stroke_color
+        return self
     
 class BoxTree(VGroup):
     defaultStyle = {
