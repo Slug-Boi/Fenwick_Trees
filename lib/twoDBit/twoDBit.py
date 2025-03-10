@@ -21,6 +21,10 @@ class TwoDBIT:
             for col in range(self.matrix_size):
                 self.Update(row, col, aux[row][col])
 
+    """
+    Return type: list[tuple[tuple[int, int], list[tuple[int, int]]]]
+    [(row, col), [(x1, y1), (x2, y2), ..., (xn, yn)], ...]
+    """
     def CreatePositions(self) -> list:
         operations = []
         for row in range(self.matrix_size):
@@ -46,7 +50,7 @@ class TwoDBIT:
             loop_y = y # Reset loop_y on every new x value
             while loop_y <= self.matrix_size:
                 self.BIT[x][loop_y] += val
-                updateIndeces.append((x, loop_y))
+                updateIndeces.append((x, loop_y, self.BIT[x][loop_y]))
                 loop_y += (loop_y & -loop_y) # Add lsb to loop_y
             x += (x & -x) # Add lsb to x
         return updateIndeces
@@ -63,7 +67,7 @@ class TwoDBIT:
             x -= (x & -x) # Add lsb to x
         return sum
 
-    def getSumPositions(self, x: int, y: int) -> tuple[int, list[tuple[int,int]]]:
+    def getSumPositions(self, x: int, y: int) -> tuple[int, list[tuple[int,int,int]]]:
         x += 1
         y += 1
         sum = 0
@@ -72,7 +76,7 @@ class TwoDBIT:
             loop_y = y
             while loop_y > 0:
                 sum += self.BIT[x][loop_y]
-                sumIndeces.append((x, loop_y))
+                sumIndeces.append((x, loop_y, self.BIT[x][loop_y]))
                 loop_y -= (loop_y & -loop_y) # Add lsb to loop_y
             x -= (x & -x) # Add lsb to x
         return sum, sumIndeces
