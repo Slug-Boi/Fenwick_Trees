@@ -58,7 +58,7 @@ class TwoDFenwick(Scene):
 
         operations = bit.CreatePositions()
 
-        for op in operations:
+        for i,op in enumerate(operations):
             base_row = base_mat.get_rows()[op[0][0]]
             base_col = base_row[op[0][1]]
             base_rect = SurroundingRectangle(base_col, color=GREEN, buff=0.1)
@@ -68,21 +68,50 @@ class TwoDFenwick(Scene):
             big_unhighlights = []
             small_unhighlights = []
             bit_rects = []
-            for update in op[1]:
-                bit_rect = SurroundingRectangle(dBitMatrix.get_rows()[update[0]][update[1]], color=GREEN, buff=0.1)
-                bit_rects.append(bit_rect)
-                self.play(Create(bit_rect))
-                self.wait(0.15)
-                self.play(FadeOut(dBitMatrix.get_rows()[update[0]][update[1]]), run_time=0.5)
-                new_obj = dBitMatrix.get_rows()[update[0]][update[1]].become(MathTex(str(update[2])).scale(0.6).move_to(dBitMatrix.get_rows()[update[0]][update[1]]))
-                self.play(FadeIn(new_obj),run_time=0.5)
+            small_tree_batch_highlights = []
+            big_tree_batch_highlights = []
+            fadein_bit_numbers = []
+            fadeout_bit_numbers = []
+            if i < 2:
+                for update in op[1]:
+                    bit_rect = SurroundingRectangle(dBitMatrix.get_rows()[update[0]][update[1]], color=GREEN, buff=0.1)
+                    bit_rects.append(bit_rect)
+                    self.play(Create(bit_rect))
+                    self.wait(0.15)
+                    self.play(FadeOut(dBitMatrix.get_rows()[update[0]][update[1]]), run_time=0.5)
+                    new_obj = dBitMatrix.get_rows()[update[0]][update[1]].become(MathTex(str(update[2])).scale(0.6).move_to(dBitMatrix.get_rows()[update[0]][update[1]]))
+                    self.play(FadeIn(new_obj),run_time=0.5)
 
-                big_unhighlights.append(big_tree[update[0]-1])
-                small_unhighlights.append(small_trees[update[0]-1][update[1]-1])
-                self.play(big_tree[update[0]-1].animate.highlight(GREEN),
-                          small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN)
-                          )
-                self.wait(0.15)
+                    big_unhighlights.append(big_tree[update[0]-1])
+                    small_unhighlights.append(small_trees[update[0]-1][update[1]-1])
+                    self.play(big_tree[update[0]-1].animate.highlight(GREEN),
+                            small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN)
+                            )
+                    self.wait(0.15)
+            else:
+                # Faster version that highlights everything at once
+                #TODO: Try and find a neater way to fade them out by somehow delaying the actual value overwrite
+                for update in op[1]:
+                    bit_rect = SurroundingRectangle(dBitMatrix.get_rows()[update[0]][update[1]], color=GREEN, buff=0.1)
+                    bit_rects.append(bit_rect)
+                    fadeout_bit_numbers.append(FadeOut(dBitMatrix.get_rows()[update[0]][update[1]], run_time=0.5))
+                    big_unhighlights.append(big_tree[update[0]-1])
+                    small_unhighlights.append(small_trees[update[0]-1][update[1]-1])
+                    big_tree_batch_highlights.append(big_tree[update[0]-1].animate.highlight(GREEN))
+                    small_tree_batch_highlights.append(small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN))
+
+                #self.play(*fadeout_bit_numbers)
+                self.play(*fadeout_bit_numbers)
+                for update in op[1]:
+                    new_obj = dBitMatrix.get_rows()[update[0]][update[1]].become(MathTex(str(update[2])).scale(0.6).move_to(dBitMatrix.get_rows()[update[0]][update[1]]))
+                    fadein_bit_numbers.append(FadeIn(new_obj, run_time=0.5))
+                self.play(*[Create(rect) for rect in bit_rects],
+                          *fadein_bit_numbers,
+                          *big_tree_batch_highlights,
+                          *small_tree_batch_highlights)
+                self.wait(0.8)
+            
+
             self.play(*[box.animate.unhighlight() for box in big_unhighlights],
                       *[box.animate.unhighlight() for box in small_unhighlights],
                       *[Uncreate(rect) for rect in bit_rects]
