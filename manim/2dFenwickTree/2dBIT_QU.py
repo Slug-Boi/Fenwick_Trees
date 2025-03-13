@@ -40,7 +40,7 @@ class QueryUpdateTwoDBIT(Scene):
 
         big_tree = BoxTree([0 for _ in range(len(M2))], show_indices=True, show_values=False, style=big_tree_style).create().rotate(PI/2).move_to(small_trees.get_corner(DL),DR).shift(LEFT*0.3)
         self.play(FadeIn(big_tree))
-        self.play(big_tree.animate.to_edge(LEFT).shift(RIGHT*0.5))
+        self.play(big_tree.animate.to_edge(LEFT).shift(RIGHT*0.2))
         self.play(small_trees.animate.move_to(big_tree.get_corner(DR),DL).shift(RIGHT*0.3))
         self.wait(2)
 
@@ -60,17 +60,20 @@ class QueryUpdateTwoDBIT(Scene):
         lag_ratio=0.2))
         self.wait(0.5)
 
+        """
+        QUERY START
+        """
 
         # Prepare the mother of all text objects...
-        fullQuery = Text("Query(3,2)", font="DejaVu Sans Condensed", font_size=36, weight=SEMIBOLD).to_edge(UP).shift(DOWN*0.3+LEFT*0.2)
-        queryText = Text("Sub-Query: (", font="DejaVu Sans Condensed", font_size=30).to_edge(UP).shift(DOWN*1+LEFT*0.8)
+        fullQuery = Text("Query(2,1)", font="DejaVu Sans Condensed", font_size=36, weight=SEMIBOLD).to_edge(UP).shift(DOWN*0.3+LEFT*0.2)
+        queryText = Text("Sub-Query: (", font="DejaVu Sans Condensed", font_size=30).to_edge(UP).shift(DOWN*1.5+LEFT*0.8)
         comma = Text(",", font="DejaVu Sans Condensed", font_size=30).next_to(queryText,RIGHT)
         endPar = Text(")", font="DejaVu Sans Condensed", font_size=30).next_to(comma,RIGHT)
         partialSums = Text("Partial Sums: [", font="DejaVu Sans Condensed", font_size=30).move_to(queryText.get_bottom(),UP).align_to(queryText,LEFT).shift(DOWN*0.4)
         endBracket = Text("]", font="DejaVu Sans Condensed", font_size=30).next_to(partialSums,RIGHT)
 
         # Write static text items 
-        ops = bit.getSumPositions(3, 2)
+        ops = bit.getSumPositions(2, 1)
         self.play(Write(fullQuery),Write(queryText), Write(endPar))
         self.wait(0.25)
         self.play(Write(partialSums), Write(endBracket))
@@ -84,13 +87,18 @@ class QueryUpdateTwoDBIT(Scene):
 
         sums_list = [] 
         comma_list = []
+        x, y = None, None
 
         for query in ops[1]:
             animations = []
+            if x is not None and y is not None:
+                # Cleanup for next run
+                self.play(FadeOut(rect_highlight), FadeOut(x), FadeOut(y))
+
             x = Text(str(query[0]), font="DejaVu Sans Condensed", font_size=30).next_to(queryText,RIGHT,buff=0.15)
             animations.append(Write(x))
 
-            animations.append(Write(comma.next_to(x,RIGHT,buff=0.15).align_to(x,DOWN)))
+            animations.append(Write(comma.next_to(x,RIGHT,buff=0.15).align_to(x,DOWN)) if y is None else comma.animate.next_to(x,RIGHT,buff=0.15).align_to(x,DOWN))
 
             y = Text(str(query[1]), font="DejaVu Sans Condensed", font_size=30).next_to(comma,RIGHT,buff=0.15).align_to(x,DOWN)
             animations.append(Write(y))
@@ -112,7 +120,7 @@ class QueryUpdateTwoDBIT(Scene):
             self.wait(0.25)
 
             # add sum to partial sums
-            sumText = Text(str(query[2]), font="DejaVu Sans Condensed", font_size=30).move_to(partialSums.get_bottom(),UP).align_to(partialSums,RIGHT).shift(DOWN*0.2+RIGHT*0.6)
+            sumText = Text(str(query[2]), font="DejaVu Sans Condensed", font_size=30).move_to(partialSums.get_center(),ORIGIN).align_to(partialSums,RIGHT).shift(RIGHT*0.58)
             sums_list.append(sumText)
 
             # Pre-move the end bracket to the right of the sum text to avoid overlap but keep y alignment
@@ -120,18 +128,40 @@ class QueryUpdateTwoDBIT(Scene):
                 sumText.move_to(sums_list[-1].get_bottom(),UP).align_to(sums_list[-1],LEFT).shift(DOWN*0.2)
                 #TODO: Put comma & bracket move into an animation group 
                 comma_list.append(Text(",", font="DejaVu Sans Condensed", font_size=30).next_to(sums_list[-2],RIGHT,buff=0.15).align_to(sums_list[-2],DOWN))
-                self.play(endBracket.animate.next_to(sums_list[-1],RIGHT,buff=0.15).align_to(sums_list[-1],DOWN))
-                self.play(Write(comma_list[-1]))
+                self.play(AnimationGroup(endBracket.animate.next_to(sums_list[-1],RIGHT,buff=0.15).align_to(sums_list[-1],DOWN).shift(DOWN*0.05),Write(comma_list[-1]), lag_ratio=0.6))
                 self.play(Write(sumText))
             else:  
                 self.play(endBracket.animate.next_to(sumText,RIGHT,buff=0.15).align_to(partialSums,DOWN))
-                self.play(Write(sumText),endBracket.animate.next_to(sumText,RIGHT,buff=0.15))
+                self.play(Write(sumText))
 
             self.wait(0.25)
 
-            # Cleanup for next run
-            self.play(FadeOut(rect_highlight), FadeOut(x), FadeOut(y))
+            
 
+        # Final cleanup and write sum
+        finalSumText = Text("Sum: ", font="DejaVu Sans Condensed", weight=SEMIBOLD,font_size=30).move_to(sums_list[-1].get_bottom(),UP).align_to(partialSums,LEFT).shift(DOWN*0.9)
+        finalSum = Text(str(ops[0]), font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).next_to(finalSumText,RIGHT,buff=0.15).align_to(finalSumText,DOWN)
 
-        # self.play(Write(queryText), Write(comma), Write(endPar))
-        # self.wait(2)
+        self.play(AnimationGroup(Write(finalSumText), Write(finalSum), lag_ratio=0.4))
+        self.wait(2)
+        self.play(Unwrite(fullQuery), 
+                  Unwrite(queryText),
+                  Unwrite(comma), 
+                  Unwrite(x),
+                  Unwrite(y),
+                  Unwrite(endPar), 
+                  Unwrite(partialSums), 
+                  Unwrite(endBracket), 
+                  Uncreate(area_base_rect), 
+                  Uncreate(rect_highlight),
+                  Unwrite(finalSumText), 
+                  Unwrite(finalSum), 
+                  *[Unwrite(sum) for sum in sums_list], 
+                  *[Unwrite(comma) for comma in comma_list],
+                  *[box.animate.unhighlight() for box in big_tree],
+                  *[innerbox.animate.unhighlight() for box in small_trees for innerbox in box],
+                  )
+        self.wait(1.5)
+        """
+        QUERY END
+        """
