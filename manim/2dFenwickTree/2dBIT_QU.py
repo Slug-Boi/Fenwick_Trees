@@ -126,7 +126,6 @@ class QueryUpdateTwoDBIT(Scene):
             # Pre-move the end bracket to the right of the sum text to avoid overlap but keep y alignment
             if len(sums_list) > 1:
                 sumText.move_to(sums_list[-1].get_bottom(),UP).align_to(sums_list[-1],LEFT).shift(DOWN*0.2)
-                #TODO: Put comma & bracket move into an animation group 
                 comma_list.append(Text(",", font="DejaVu Sans Condensed", font_size=30).next_to(sums_list[-2],RIGHT,buff=0.15).align_to(sums_list[-2],DOWN))
                 self.play(AnimationGroup(endBracket.animate.next_to(sums_list[-1],RIGHT,buff=0.15).align_to(sums_list[-1],DOWN).shift(DOWN*0.05),Write(comma_list[-1]), lag_ratio=0.6))
                 self.play(Write(sumText))
