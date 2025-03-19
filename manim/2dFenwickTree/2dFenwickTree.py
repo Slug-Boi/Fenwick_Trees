@@ -4,7 +4,29 @@ from box_tree import *
 from fenwick_tree import FenwickTree
 from copy import deepcopy
 
+def binary_index(index,b_len) -> str:
+    return "{0:0{b_len}b}".format(index, b_len=b_len)
+
+
 class TwoDFenwick(Scene):
+    def math_animate(self, index, repl_obj, point) -> Text:
+        copy_repl = repl_obj.copy()
+        copy_result_trans = repl_obj.copy().set_opacity(0)
+        self.add(copy_repl)
+        bit_value = Text(binary_index(index, 3), font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).move_to(point)
+        self.play(Transform(copy_repl, bit_value))
+        lsb = Text("+ "+binary_index((index & -index),3), font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).move_to(bit_value.get_bottom()+DOWN*0.15,UP).align_to(bit_value,RIGHT)
+        self.play(Write(lsb))
+        line = Line(lsb.get_corner(DL), lsb.get_corner(DR), color=WHITE).shift(DOWN*0.08)
+        self.play(Create(line))
+        result = Text(binary_index(index + (index & -index),3), font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).move_to(lsb.get_bottom()+DOWN*0.17,UP).align_to(lsb,RIGHT)
+        self.play(Write(result))
+        self.wait(0.2)
+        copy_result_trans.become(Text(str(index + (index & -index)), font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).move_to(repl_obj))
+        self.play(FadeOut(copy_repl), FadeOut(bit_value), FadeOut(lsb), FadeOut(line), FadeOut(repl_obj), ReplacementTransform(result,copy_result_trans.set_opacity(1)))      
+        self.wait(0.3)
+        return copy_result_trans
+
     def construct(self):
         M2 = [
                 [3,  4,  0, 2],
@@ -19,12 +41,12 @@ class TwoDFenwick(Scene):
 
         small_tree_style = deepcopy(BoxTree.defaultStyle)
         small_tree_style["rect"]["height"] = 0.25
-        small_trees = VGroup()
+        self.small_trees = VGroup()
         for i in range(len(M2)):
-            small_trees.add(BoxTree([0 for _ in range(len(M2[i]))], style=small_tree_style, show_indices=True, show_values=False).create().scale(0.75))
+            self.small_trees.add(BoxTree([0 for _ in range(len(M2[i]))], style=small_tree_style, show_indices=True, show_values=False).create().scale(0.75))
 
-        small_trees.arrange(UP, buff=1)
-        self.play(LaggedStart(*[FadeIn(tree) for tree in small_trees], lag_ratio=0.5))
+        self.small_trees.arrange(UP, buff=1)
+        self.play(LaggedStart(*[FadeIn(tree) for tree in self.small_trees], lag_ratio=0.5))
         self.wait(0.75)
 
         big_tree_style = deepcopy(BoxTree.defaultStyle)
@@ -32,15 +54,15 @@ class TwoDFenwick(Scene):
         #(small_trees[1].get_center() - small_trees[0].get_center())[1] - big_tree_style["rect"]["height"]*2
         big_tree_style["y_buffer"] = 0.4
         big_tree_style["rect"]["height"] = 0.35
-        big_tree_style["rect"]["width"] = small_trees[0].get_height()
+        big_tree_style["rect"]["width"] = self.small_trees[0].get_height()
 
-        big_tree = BoxTree([0 for _ in range(len(M2))], show_indices=True, show_values=False, style=big_tree_style).create().rotate(PI/2).move_to(small_trees.get_corner(DL),DR).shift(LEFT*0.3)
+        big_tree = BoxTree([0 for _ in range(len(M2))], show_indices=True, show_values=False, style=big_tree_style).create().rotate(PI/2).move_to(self.small_trees.get_corner(DL),DR).shift(LEFT*0.3)
         self.play(FadeIn(big_tree))
-        self.play(big_tree.animate.to_edge(LEFT).shift(RIGHT*1.5))
-        self.play(small_trees.animate.move_to(big_tree.get_corner(DR),DL).shift(RIGHT*0.3))
+        self.play(big_tree.animate.to_edge(LEFT))
+        self.play(self.small_trees.animate.move_to(big_tree.get_corner(DR),DL).shift(RIGHT*0.3))
         self.wait(2)
 
-        fenwick_mat_label = Text("Fenwick Tree Matrix", weight=SEMIBOLD, font="DejaVu Sans Condensed", font_size=36).to_corner(UR).shift(LEFT*1)
+        fenwick_mat_label = Text("Fenwick Tree Matrix", weight=SEMIBOLD, font="DejaVu Sans Condensed", font_size=36).to_corner(UR).shift(LEFT*0.2)
         dBitMatrix = Matrix(bit.BIT).scale(0.7).move_to(fenwick_mat_label.get_bottom(),UP).shift(DOWN*0.2)
         self.play(
             AnimationGroup(Write(fenwick_mat_label),
@@ -58,6 +80,47 @@ class TwoDFenwick(Scene):
 
         operations = bit.CreatePositions()
 
+        # Create codeblock to show shift operations
+        codeblock = Code(
+            code_file="updateShiftExample.py",
+            background="rectangle",
+            language="python",
+            tab_width=2,
+            add_line_numbers=False,
+        ).scale_to_fit_width((dBitMatrix.get_left()[0]-self.small_trees.get_right()[0])*0.95).next_to(self.small_trees,RIGHT,buff=0.38).align_to(self.small_trees,DOWN)
+
+        self.sliding_wins = VGroup()
+
+        self.play(FadeIn(codeblock))
+
+        xy_center_dist = abs(self.small_trees.get_right()[0] - dBitMatrix.get_left()[0])
+        # Magic space on x end dont question it 
+        x_text = Text("x = ", font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).next_to(self.small_trees,RIGHT,buff=1.5)
+        x_value = Text("1", font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).next_to(x_text,RIGHT, buff=0.15).align_to(x_text,DOWN)
+        y_text = Text("y =", font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).next_to(x_value,RIGHT).align_to(x_text,UP)
+        y_value = Text("1", font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).next_to(y_text,RIGHT,buff=0.15).align_to(x_value,UP)
+        self.xy_group = VGroup(x_text, x_value, y_text, y_value)
+        self.xy_group.move_to(self.small_trees.get_right() + (xy_center_dist/2)*RIGHT).to_edge(UP)
+
+        self.play(Write(x_text), Write(x_value), Write(y_text), Write(y_value))
+
+
+        for line in codeblock.code_lines:
+            self.sliding_wins.add(
+                SurroundingRectangle(line,buff=0.025)
+                .set_fill(YELLOW)
+                .set_opacity(0)
+                .stretch_to_fit_width(codeblock.background.get_width())
+                .align_to(codeblock.background, LEFT)
+            )
+            if len(self.sliding_wins) > 1:
+                self.sliding_wins[-1].stretch_to_fit_height(self.sliding_wins[0].get_height())
+                self.sliding_wins[-1].shift(DOWN*0.05)
+
+        self.add(self.sliding_wins)
+
+        shifted_objects = False
+
         for i,op in enumerate(operations):
             base_row = base_mat.get_rows()[op[0][0]]
             base_col = base_row[op[0][1]]
@@ -73,32 +136,84 @@ class TwoDFenwick(Scene):
             fadein_bit_numbers = []
             fadeout_bit_numbers = []
             if i < 2:
+                previous_x = op[1][0]
+                replacement_x = Text(str(op[0][0]+1), font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).next_to(x_text,RIGHT,buff=0.15).align_to(x_text,DOWN)
+                self.play(Transform(self.xy_group[1], replacement_x))
+                self.xy_group[1].become(replacement_x)
                 for update in op[1]:
                     bit_rect = SurroundingRectangle(dBitMatrix.get_rows()[update[0]][update[1]], color=GREEN, buff=0.1)
                     bit_rects.append(bit_rect)
+
+                    # Highlight while x <= matrix_size:
+                    if update[0] != previous_x:
+                        self.play(self.sliding_wins[0].animate.set_opacity(0.3))
+                        self.wait(0.15)
+                        self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
+                                  self.sliding_wins[1].animate.set_opacity(0.3))
+                        self.wait(0.15)
+                        replacement_y = Text(str(op[0][1]+1), font="DejaVu Sans Condensed", weight=SEMIBOLD, font_size=30).next_to(y_text,RIGHT,buff=0.15).align_to(x_value,UP)
+                        self.play(Transform(self.xy_group[-1], replacement_y))
+                        self.xy_group[-1].become(replacement_y)
+
+                    # Highlight while loop_y <= matrix_size:
+                    self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
+                              self.sliding_wins[2].animate.set_opacity(0.3))
+                    self.wait(0.15)
+                    self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins], 
+                              self.sliding_wins[3].animate.set_opacity(0.3))
+                    self.wait(0.1)
+
                     self.play(Create(bit_rect))
                     self.wait(0.15)
                     self.play(FadeOut(dBitMatrix.get_rows()[update[0]][update[1]]), run_time=0.5)
                     new_obj = dBitMatrix.get_rows()[update[0]][update[1]].become(MathTex(str(update[2])).scale(0.6).move_to(dBitMatrix.get_rows()[update[0]][update[1]]))
                     self.play(FadeIn(new_obj),run_time=0.5)
 
-                    big_unhighlights.append(big_tree[update[0]-1])
-                    small_unhighlights.append(small_trees[update[0]-1][update[1]-1])
+                    # loop_y += (loop_y & -loop_y)
+                    self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
+                              self.sliding_wins[4].animate.set_opacity(0.3))
+                    
+
+                    temp = self.math_animate(update[1], self.xy_group[-1], self.xy_group.get_center()+DOWN*0.75)
+                    self.xy_group[-1] = temp
+
                     self.play(big_tree[update[0]-1].animate.highlight(GREEN),
-                            small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN)
+                            self.small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN)
                             )
                     self.wait(0.15)
+                    if update[1] + (update[1] & -(update[1])) > bit.matrix_size:
+                        self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins], 
+                                  self.sliding_wins[5].animate.set_opacity(0.3))
+                        self.wait(0.15)
+                        temp = self.math_animate(update[0], self.xy_group[1], self.xy_group.get_center()+DOWN*0.75)
+                        self.xy_group[1] = temp
+                        self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins])
+                        self.wait(0.15)
+
+                    previous_x = update[0]
             else:
                 # Faster version that highlights everything at once
-                #TODO: Try and find a neater way to fade them out by somehow delaying the actual value overwrite
+                if not shifted_objects:
+                    # Shift all the objects 
+                    self.play(FadeOut(codeblock), FadeOut(self.xy_group))
+                    self.play(AnimationGroup(big_tree.animate.shift(RIGHT*1), 
+                                             fenwick_mat_label.animate.shift(LEFT*0.7)),
+                                             MaintainPositionRelativeTo(self.small_trees, big_tree),
+                                             MaintainPositionRelativeTo(dBitMatrix, fenwick_mat_label),
+                                             MaintainPositionRelativeTo(base_mat_label, fenwick_mat_label),
+                                             MaintainPositionRelativeTo(base_mat, fenwick_mat_label),
+                                             MaintainPositionRelativeTo(base_rect, fenwick_mat_label),
+                                             )
+                    shifted_objects = True
+
                 for update in op[1]:
                     bit_rect = SurroundingRectangle(dBitMatrix.get_rows()[update[0]][update[1]], color=GREEN, buff=0.1)
                     bit_rects.append(bit_rect)
                     fadeout_bit_numbers.append(FadeOut(dBitMatrix.get_rows()[update[0]][update[1]], run_time=0.5))
                     big_unhighlights.append(big_tree[update[0]-1])
-                    small_unhighlights.append(small_trees[update[0]-1][update[1]-1])
+                    small_unhighlights.append(self.small_trees[update[0]-1][update[1]-1])
                     big_tree_batch_highlights.append(big_tree[update[0]-1].animate.highlight(GREEN))
-                    small_tree_batch_highlights.append(small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN))
+                    small_tree_batch_highlights.append(self.small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN))
 
                 #self.play(*fadeout_bit_numbers)
                 self.play(*fadeout_bit_numbers)

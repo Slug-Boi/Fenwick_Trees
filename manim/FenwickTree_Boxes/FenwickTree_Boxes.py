@@ -89,16 +89,16 @@ class Test(Scene):
         self.play(Create(box_group,lag_ratio=0.1), Write(text_group, lag_ratio=0.1), Write(index_group, lag_ratio=0.1))
 
         plus = plus_sign(0, boxes)
-        self.play(Write(plus),
+        self.play(FadeIn(plus),run_time=0.25)
+        self.play(
                   startArray[0].animate.highlight(stroke_color=PINK),
                   startArray[1].animate.highlight(stroke_color=PINK),
                   *[highlight_box(boxes[i][0]) for i in range(2)]
                   )
         
         self.wait(0.5)
-        self.play(Unwrite(plus),
-                  *[highlight_box(boxes[i][0], BLUE) for i in range(2)]
-                  )
+        self.play(FadeOut(plus),run_time=0.25)
+        self.play(*[highlight_box(boxes[i][0], BLUE) for i in range(2)])
       
         self.moveNumBox(boxes[1], UP, UPLEVEL, index_group[1])
 
@@ -127,17 +127,14 @@ class Test(Scene):
 
         plus = plus_sign(2, boxes)
         plus2 = plus_sign_manual(sumBox1, 0)
-        self.play(Write(plus),
-                  Write(plus2),
-                  startArray[2].animate.highlight(stroke_color=PINK),
+        self.play(FadeIn(plus), FadeIn(plus2), run_time=0.25)
+        self.play(startArray[2].animate.highlight(stroke_color=PINK),
                   startArray[3].animate.highlight(stroke_color=PINK),
                   *[highlight_box(boxes[i][0]) for i in range(1,4)]
                   )
         self.wait(0.5)
-        self.play(Unwrite(plus), 
-                  Unwrite(plus2), 
-                  *[highlight_box(boxes[i][0], BLUE) for i in range(1,4)]
-                  )
+        self.play(FadeOut(plus), FadeOut(plus2), run_time=0.25)
+        self.play(*[highlight_box(boxes[i][0], BLUE) for i in range(1,4)])
 
         self.moveNumBox(boxes[3], UP, UPLEVEL*2, index_group[3])
 
@@ -162,15 +159,14 @@ class Test(Scene):
                   startArray[3].animate.unhighlight())
 
         plus = plus_sign(4, boxes)
-        self.play(Write(plus),
-                  startArray[4].animate.highlight(stroke_color=PINK),
+        self.play(FadeIn(plus), run_time=0.25)
+        self.play(startArray[4].animate.highlight(stroke_color=PINK),
                   startArray[5].animate.highlight(stroke_color=PINK),
                   *[highlight_box(boxes[i][0]) for i in range(4,6)]
                   )
         self.wait(0.5)
-        self.play(Unwrite(plus),
-                  *[highlight_box(boxes[i][0], BLUE) for i in range(4,6)]
-                  )
+        self.play(FadeOut(plus), run_time=0.25)
+        self.play(*[highlight_box(boxes[i][0], BLUE) for i in range(4,6)])
 
         self.moveNumBox(boxes[5], UP, UPLEVEL, index_group[5])
         
@@ -192,10 +188,8 @@ class Test(Scene):
         plus = plus_sign(6, boxes)
         plus2 = plus_sign_manual(sumBox2, 0)
         plus3 = plus_sign_manual(sumBox3, 0)
-        self.play(Write(plus), 
-                  Write(plus2), 
-                  Write(plus3),
-                  startArray[0].animate.highlight(stroke_color=PINK),
+        self.play(FadeIn(plus), FadeIn(plus2), FadeIn(plus3), run_time=0.25)
+        self.play(startArray[0].animate.highlight(stroke_color=PINK),
                   startArray[1].animate.highlight(stroke_color=PINK),
                   startArray[2].animate.highlight(stroke_color=PINK),
                   startArray[3].animate.highlight(stroke_color=PINK),
@@ -206,9 +200,8 @@ class Test(Scene):
                   highlight_box(boxes[-1][0]),
                   )
         self.wait(0.5)
-        self.play(Unwrite(plus), Unwrite(plus2), Unwrite(plus3),
-                  *[highlight_box(boxes[i][0], BLUE) for i in range(0,8)]
-                  )
+        self.play(FadeOut(plus), FadeOut(plus2), FadeOut(plus3), run_time=0.25)
+        self.play(*[highlight_box(boxes[i][0], BLUE) for i in range(0,8)])
 
         self.moveNumBox(boxes[7], UP, UPLEVEL*3, index_group[7])
 
