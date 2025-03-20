@@ -1,7 +1,8 @@
 import time
 import MatrixSum
-import testDataGenerator
-from ndFenwick.ndfenwick import NDBit
+import MatrixGenerator as mg
+import numpy as np
+from ndFenwick import NDBit
 from random import randint
 import argparse
 
@@ -14,7 +15,7 @@ def current_milli_time():
 
 def randomData(dim: tuple[int], num_test: int, random_range: tuple[int], debug_print: bool):
     for test in range(num_test):
-        testMatrix = testDataGenerator.CreateRandomNDMatrix(dim, random_range)
+        testMatrix = mg.create_random_ndmatrix(dim, random_range)
         fenwick = NDBit(testMatrix, len(dim))
         
         queryPosition = [randint(1, dimension-1) for dimension in dim]
@@ -38,7 +39,7 @@ def oneDFenwickSums():
     pass
 
 def twoDFenwickSums(MatrixDimensions: tuple[int], random_range: tuple[int, int], debug_print: bool):
-    testMatrix = testDataGenerator.CreateRandomNDMatrix(MatrixDimensions, random_range)
+    testMatrix = mg.create_random_ndmatrix(MatrixDimensions, random_range)
     fenwick = NDBit(testMatrix, 2)
     
     queryPosition = [randint(1, MatrixDimensions[0]-1), randint(1,MatrixDimensions[1]-1)]
