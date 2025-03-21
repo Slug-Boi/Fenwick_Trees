@@ -101,7 +101,7 @@ class TwoDBIT:
         s4 = self.getSum(point1[0]-1, point1[1]-1) # Overlap box
         
         result = s1 - s2 - s3 + s4
-        return result, (point2[0], point2[1]), (point2[0], point1[1]-1), (point1[0]-1, point2[1]), (point1[0]-1, point1[1]-1)
+        return result, (point2[0], point2[1], s1), (point2[0], point1[1]-1, s2), (point1[0]-1, point2[1], s3), (point1[0]-1, point1[1]-1, s4)
 
     def PrintBit(self):
         for row in self.BIT:
