@@ -1,14 +1,23 @@
-use pyo3::{prelude::*, types::PyString};
+use pyo3::{prelude::*, types::{PyList, PyString}};
 use std::fs;
 use std::io::prelude::*;
-use rayon::{option, prelude::*, string};
+use rayon::{iter::Update, option, prelude::*, string};
+use ndarray::{Array, ArrayBase, ArrayD, ArrayViewD, Dim, IxDyn, IxDynImpl, OwnedRepr};
+use numpy::{IntoPyArray, PyArray, PyArrayDyn, PyArrayMethods, PyReadonlyArrayDyn, ToPyArray};
 
 /// A Python module implemented in Rust.
 #[pymodule]
 fn fenwick_tree(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<FenwickTree>()?;
+    m.add_class::<NdFenwick>()?;
     Ok(())
 }
+
+#[derive(FromPyObject)]
+    enum SupportedArray<'py> {
+        F64(Bound<'py, PyArray<f64, IxDyn>>),
+        I64(Bound<'py, PyArray<i64, IxDyn>>),
+    }
 
 
 // Current code is heavily based on the implementation of Fenwick Tree in GeeksforGeeks
@@ -19,8 +28,8 @@ fn fenwick_tree(m: &Bound<'_, PyModule>) -> PyResult<()> {
 // Important note here is that the tree is 1 indexed, so the first element is at index 1
 // BUT when making range or sum calls the input index is 0 indexed so a tree of size 5 will have valid indices 0, 1, 2, 3, 4
 fn index_check(index: i32, size: usize) {
-    if index >= 0 || index < size as i32 {
-        return
+    if index >= 0 && index < size as i32 {
+        return;
     }
     panic!("Index out of bounds {}, size {}", index, size);
 }
@@ -164,9 +173,9 @@ impl FenwickTree {
 // The size is a vector of the n-th dimension sizes
 #[pyclass]
 struct NdFenwick {
-    tree: Vec<PyObject>,
+    tree: Array<i64, IxDyn>,
     dim: i32,
-    size: Vec<i32>
+    size: i32
 }
 
 fn create_empty_bit<T: Clone + Default>(dim: i32, inp: Vec<T>) -> Vec<T> {
@@ -180,14 +189,8 @@ fn create_empty_bit<T: Clone + Default>(dim: i32, inp: Vec<T>) -> Vec<T> {
     bit.concat()
 }
 
-#[pymethods]
-impl NdFenwick {
-    
-    // takes a python list as input and checks if its a i32 or a list
-    
-
-    fn FillTree(&mut self, inp: Bound<'_, PyList>, dim: i32, position: Bound<'_, PyList>) {
-        Python::with_gil(|py| {
+/*
+Python::with_gil(|py| {
         if dim == 1 {
             for i in 0..inp.len() {
                 let mut temp_pos = position.clone();
@@ -197,58 +200,77 @@ impl NdFenwick {
             }
             return;
         }
-
+    
         for i in 0..inp.len() {
             let mut temp_pos = position.clone();
             temp_pos.append(i.into_py(py)).unwrap();
             self.FillTree(inp.get_item(i).unwrap().downcast::<PyList>().unwrap().clone(), dim-1, temp_pos);
         }
         });
+ */
+
+ fn fill_tree(dim: i32, inp: Array<i64,IxDyn>, position: Vec<i32>, tree: &mut NdFenwick) -> Array<i64, IxDyn> {
+    if dim == 1 {
+        for i in 0..inp.shape()[0] {
+            let mut temp_pos = position.clone();
+            temp_pos.push(i as i32);
+            tree.update(temp_pos, inp[i as usize]);
+        }
     }
 
-    fn Update(&mut self, position: Vec<i32>, val: i32) {
-        fn UpdateHelper(position: &[i32], val: i32, array: &mut Vec<PyObject>) {
-            Python::with_gil(|py| {
-            let mut dimension = position[0] as usize;
-            while dimension < array.len() {
+    for i in 0..inp.shape().len() {
+        let mut temp_pos = position.clone();
+        temp_pos.push(i as i32);
+        tree.tree = fill_tree(dim-1, inp.index_axis(ndarray::Axis(0), i).to_owned(), temp_pos, tree);
+    }
+    return tree.tree.clone();
+}
+
+//TODO: Figure out how to make the while loop length check correctly and apply the same to inp on fill_tree
+
+#[pymethods]
+impl NdFenwick {
+    // takes a python list as input and checks if its a i32 or a list    
+    fn update(&mut self, position: Vec<i32>, val: i64) {
+        fn update_helper(position: &Vec<i32>, val: i64, tree: &mut Array<i64, IxDyn>) -> Array<i64, IxDyn> {
+            let mut dimension = position[0];
+            while dimension < tree.shape()[0] as i32 {
                 if position.len() != 1 {
-                    UpdateHelper(&position[1..], val, array[dimension].extract::<Vec<PyObject>>(py).unwrap().as_mut());
+                    let updated_subtree = update_helper(&position[1..].to_vec(), val, &mut tree.index_axis_mut(ndarray::Axis(0), dimension as usize).to_owned());
+                    tree.index_axis_mut(ndarray::Axis(0), dimension as usize).assign(&updated_subtree);
                 } else {
-                    array[dimension] = (array[dimension].extract::<i32>(py).unwrap() + val).into_py(py);
+                    tree[dimension as usize] += val;
                 }
-                dimension += dimension & -(dimension as i32) as usize;
+;
+                dimension += dimension & -dimension;
             }
-            });
+            return tree.clone();
         }
 
         let position: Vec<i32> = position.iter().map(|x| x + 1).collect();
         
-        UpdateHelper(&position, val, &mut self.tree);
+        self.tree = update_helper(&position, val, &mut self.tree);
     }
 
     #[new]
-    fn new(input: Bound<'_, PyList>, dim: i32) -> Self {
-        // if dim is 1d collect as a vector of i32 else collect as a vector of PyObject
-        let inp: Vec<_> = Python::with_gil(|py| {
-            if dim == 1 {
-                input.iter().map(|x| x.extract::<i32>().unwrap()).collect()
-            } else {
-                input.iter().map(|x| x.into_py(py)).collect()
-            }
-        });
-        let size = inp.len() as i32;
-        let tree = create_empty_bit(dim, size.clone())
-            .into_iter()
-            .map(|_| Python::with_gil(|py| 0.into_py(py)))
-            .collect();
-
-        let mut nd_fenwick = NdFenwick { tree, dim, size };
+    fn new(input: PyReadonlyArrayDyn<i64>, dim: i32) -> Self {
         
+        let inp = input.as_array();
+
+        let size = inp.len() as i32;
+
+        // 1 index the tree in all dimensions and zero all values
+        let tree: Array<i64, IxDyn> = Array::zeros(IxDyn(&inp.shape().iter().map(|x| *x+1 as usize).collect::<Vec<usize>>()));
+        
+        let mut nd_fenwick = NdFenwick { tree, dim, size };
+
+        nd_fenwick.tree = fill_tree(dim, inp.to_owned(), Vec::new(), &mut nd_fenwick);
+
         return nd_fenwick;
     }
 
-    fn get_tree(&self) -> &Vec<PyObject> {
-        &self.tree
+    fn get_tree<'py>(&self, py: Python<'py>) -> Py<PyArray<i64, IxDyn>> {
+        self.tree.clone().into_pyarray(py).unbind()
     }
 
 }
