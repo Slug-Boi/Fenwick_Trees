@@ -31,7 +31,7 @@ class TwoDFenwick(Scene):
             )
 
         self.small_trees.arrange(UP, buff=1)
-        self.play(LaggedStart(*[FadeIn(tree) for tree in self.small_trees], lag_ratio=0.5))
+        self.play(LaggedStart(*[FadeIn(tree) for tree in self.small_trees], lag_ratio=0.5), run_time=0.7)
         self.wait(0.75)
 
         big_tree_style = deepcopy(BoxTree.defaultStyle)
@@ -51,9 +51,9 @@ class TwoDFenwick(Scene):
             .rotate(PI/2)
             .move_to(self.small_trees.get_corner(DL),DR).shift(LEFT*0.3)
         )
-        self.play(FadeIn(self.big_tree))
-        self.play(self.big_tree.animate.to_edge(LEFT).shift(RIGHT*1.5))
-        self.play(self.small_trees.animate.move_to(self.big_tree.get_corner(DR),DL).shift(RIGHT*0.3))
+        self.play(FadeIn(self.big_tree), run_time=0.7)
+        self.play(self.big_tree.animate.to_edge(LEFT).shift(RIGHT*1.5), run_time=0.7)
+        self.play(self.small_trees.animate.move_to(self.big_tree.get_corner(DR),DL).shift(RIGHT*0.3), run_time=0.7)
         self.wait(1)
 
         fenwick_mat_label = (
