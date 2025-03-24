@@ -301,5 +301,28 @@ impl NdFenwick {
         wrapped_sum_query(&position, &self.tree)
     }
 
+    fn range_sum_query(&self, point1: Vec<i32>, point2: Vec<i32>) -> Option<i64> {
+        if point1.len() != point2.len() ||
+           point1.len() != self.dim as usize || 
+           point2.len() != self.dim as usize {
+            return None;
+        }
+
+        match self.dim {
+            1 => return Some(self.sum_query(point2) - self.sum_query(point1)),
+            2 => {
+                let s1 = self.sum_query(point2.clone());
+                let s2 = self.sum_query(vec![point2[0], point1[1]-1]);
+                let s3 = self.sum_query(vec![point1[0]-1, point2[1]]);
+                let s4 = self.sum_query(point1.into_iter().map(|x| x-1).collect());
+                
+                return Some(s1 - s2 - s3 + s4);
+            },
+            _ => {
+                return None;
+            }
+        }
+        
+    }
 
 }
