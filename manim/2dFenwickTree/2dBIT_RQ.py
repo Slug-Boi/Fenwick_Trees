@@ -150,9 +150,9 @@ class QueryUpdateTwoDBIT(Scene):
                 Text(
                     f"Query({square[0]}, {square[1]}) = ",
                     font="DejaVu Sans Condensed",
-                    font_size = 30,
+                    font_size = 28,
                     color=color,
-                    stroke_color=color,
+                    stroke_color=color
                 )
             )
             if subQueriesText:
@@ -162,7 +162,7 @@ class QueryUpdateTwoDBIT(Scene):
             else:
                 subQueryText.next_to(fullQuery, DOWN)
                 subQueryText.align_to(fullQuery, LEFT)
-                subQueryText.shift(RIGHT*0.1)
+                subQueryText.shift(RIGHT*0.2)
             self.play(Write(subQueryText), run_time=0.85)
             self.wait(0.3)
             subQueriesText.append(subQueryText)
@@ -214,4 +214,59 @@ class QueryUpdateTwoDBIT(Scene):
             )
             self.wait(0.1)
         
-        self.wait(2)
+        
+        # Calculate final result
+        resultText = (
+            Text(
+                "Result =",
+                font="DejaVu Sans Condensed",
+                font_size=28,
+            )
+            .next_to(subQueriesText[-1], DOWN, buff=1)
+            .align_to(fullQuery, LEFT)
+        )
+        self.play(Write(resultText))
+        self.wait(0.2)
+        self.add(*[result.copy() for result in subQueryResults])
+        
+        # Move sub results into calculation
+
+        separation = 0.17
+        minus1 = Text("-", font="DejaVu Sans Condensed", font_size=28)
+        self.play(subQueryResults[0].animate.next_to(resultText, RIGHT, buff=separation).align_to(resultText, DOWN))
+        self.play(FadeIn(minus1.next_to(subQueryResults[0], RIGHT, buff=separation)))
+
+        minus2 = minus1.copy()
+        self.play(subQueryResults[1].animate.next_to(minus1, RIGHT, buff=separation).align_to(resultText, DOWN))
+        self.play(FadeIn(minus2.next_to(subQueryResults[1], RIGHT, buff=separation)))
+
+        plus = Text("+", font="DejaVu Sans Condensed", font_size=20)
+        self.play(subQueryResults[2].animate.next_to(minus2, RIGHT, buff=separation).align_to(resultText, DOWN))
+        self.play(FadeIn(plus.next_to(subQueryResults[2], RIGHT, buff=separation)))
+
+        self.play(subQueryResults[3].animate.next_to(plus, RIGHT, buff=separation).align_to(resultText, DOWN))
+
+        self.wait(0.5)
+        # Colaps into final result
+        finalResult = (
+            Text(
+                str(result),
+                font=resultText.font,
+                font_size=resultText.font_size,
+                weight=resultText.weight
+            )
+            .next_to(resultText, RIGHT, buff=separation)
+            .align_to(resultText, DOWN)
+        )
+        resultGroup = VGroup(
+            subQueryResults[0],
+            minus1,
+            subQueryResults[1],
+            minus2,
+            subQueryResults[2],
+            plus,
+            subQueryResults[3]
+        )
+        self.play(FadeTransformPieces(resultGroup, finalResult))
+
+        self.wait(3)
