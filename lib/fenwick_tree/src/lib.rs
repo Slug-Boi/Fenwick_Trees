@@ -234,8 +234,8 @@ fn wrapped_sum_query(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
 }
 
 
-//TODO: Figure out how to make the while loop length check correctly and apply the same to inp on fill_tree
 
+// TODO: Figure out a faster way of computing things based on the temp position vector. The constant vector cloning and creation is probably slowing down the code a lot
 fn fill_tree(dim: i32, inp: ArrayView<i64,IxDyn>, position: Vec<i32>, tree: &mut NdFenwick) -> Array<i64, IxDyn> {
     if dim == 1 {
         inp.iter().enumerate().for_each(|(i, &val)| {
