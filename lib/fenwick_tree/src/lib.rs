@@ -226,6 +226,29 @@ Python::with_gil(|py| {
     return tree.tree.clone();
 }
 
+
+/* 
+    NdFenwick Tree generalised functions. We want to use slices and other rust based functions to make the code more efficient but pyo3 requires extensions to these base structures so instead we define them here and call into them
+*/
+fn wrapped_sum_query(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
+    fn query_helper(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
+        let mut dimension = position[0];
+        let mut sum = 0;
+        while dimension > 0 {
+            if position.len() != 1 {
+                sum += query_helper(&position[1..], &tree.index_axis(ndarray::Axis(0), dimension as usize).to_owned());
+            } else {
+                sum += tree[dimension as usize];
+            }
+            dimension -= dimension & -dimension;
+        }
+        return sum;
+    }
+
+    query_helper(&position, &tree)
+}
+
+
 //TODO: Figure out how to make the while loop length check correctly and apply the same to inp on fill_tree
 
 #[pymethods]
@@ -272,5 +295,11 @@ impl NdFenwick {
     fn get_tree<'py>(&self, py: Python<'py>) -> Py<PyArray<i64, IxDyn>> {
         self.tree.clone().into_pyarray(py).unbind()
     }
+    
+    fn sum_query(&self, position: Vec<i32>) -> i64 {
+        let position: Vec<i32> = position.iter().map(|x| x + 1).collect();
+        wrapped_sum_query(&position, &self.tree)
+    }
+
 
 }
