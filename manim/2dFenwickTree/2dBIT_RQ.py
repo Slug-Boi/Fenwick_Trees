@@ -61,8 +61,11 @@ class QueryUpdateTwoDBIT(Scene):
         self.wait(2)
 
         fenwick_mat_label = (
+            # This has to use a f string. 
+            # Otherwise manim can't combine the sub-renders 
+            # into the full animation (for some reason)
             Text(
-                "Fenwick Tree Matrix", 
+                f"Fenwick Tree Array",
                 weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36
@@ -87,7 +90,7 @@ class QueryUpdateTwoDBIT(Scene):
 
         base_mat_label = (
             Text(
-                "Base Matrix", 
+                "Input Array", 
                 weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36
@@ -148,7 +151,7 @@ class QueryUpdateTwoDBIT(Scene):
             # Create and write sub query text
             subQueryText = (
                 Text(
-                    f"Query({square[0]}, {square[1]}) = ",
+                    f"Query({square[0]}, {square[1]}) =",
                     font="DejaVu Sans Condensed",
                     font_size = 28,
                     color=color,
@@ -162,7 +165,7 @@ class QueryUpdateTwoDBIT(Scene):
             else:
                 subQueryText.next_to(fullQuery, DOWN)
                 subQueryText.align_to(fullQuery, LEFT)
-                subQueryText.shift(RIGHT*0.2)
+                subQueryText.shift(RIGHT*0.3)
             self.play(Write(subQueryText), run_time=0.85)
             self.wait(0.3)
             subQueriesText.append(subQueryText)
