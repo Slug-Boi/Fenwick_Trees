@@ -27,7 +27,7 @@ import numpy as np
 # print(newtree.get_sum_indices(3))
 
 
-data = mg.create_random_ndmatrix((1000,1000), (0, 10))
+data = mg.create_random_ndmatrix((2000,2000), (0, 10))
 
 starttime = time.time()
 fenwick_tree = fenwick_tree.NdFenwick(np.array(data,dtype=int), 2)
