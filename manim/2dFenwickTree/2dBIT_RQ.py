@@ -189,160 +189,34 @@ class QueryUpdateTwoDBIT(Scene):
         self.wait(0.25)       
         squareColors = [BLUE, PINK, RED, YELLOW]
         subSquares = []
+        subQueriesText = []
         for color, square in zip(squareColors, ops):
+            # Create and write sub query text
+            subQueryText = (
+                Text(
+                    f"Query({square[0], square[1]}) = ",
+                    font="DejaVu Sans Condensed",
+                    font_size = 30,
+                    color=color,
+                    stroke_color=color,
+                )
+            )
+            if subQueriesText:
+                subQueryText.next_to(subQueriesText[-1], DOWN)
+                subQueryText.align_to(subQueriesText[-1], LEFT)
+                # subQueryText.shift(RIGHT*0.1)
+            else:
+                subQueryText.next_to(fullQuery, DOWN)
+                subQueryText.align_to(fullQuery, LEFT)
+                subQueryText.shift(RIGHT*0.1)
+            self.play(Write(subQueryText), run_time=0.85)
+            self.wait(0.3)
+            subQueriesText.append(subQueryText)
+
+            # Create and draw input matrix square
             subQueryRows = [item for sublist in [base_mat.get_mob_matrix()[i][0:square[1]+1] for i in range(0, square[0]+1)] for item in sublist]
             subQuerySquare = SurroundingRectangle(*subQueryRows, color=color, buff=0.1)
             subSquares.append(subQuerySquare)
             self.play(Create(subQuerySquare))
             self.wait(0.5)
 
-
-        # for query in ops[1]:
-        #     animations = []
-        #     if x is not None and y is not None:
-        #         # Cleanup for next run
-        #         self.play(FadeOut(rect_highlight), FadeOut(x), FadeOut(y))
-
-        #     x = (
-        #         Text(
-        #             str(query[0]), 
-        #             font="DejaVu Sans Condensed", 
-        #             font_size=30
-        #         )
-        #         .next_to(queryText,RIGHT,buff=0.15)
-        #     )
-        #     animations.append(Write(x))
-
-        #     animations.append(
-        #         Write(comma.next_to(x,RIGHT,buff=0.15).align_to(x,DOWN)) if y is None else comma.animate.next_to(x,RIGHT,buff=0.15).align_to(x,DOWN)
-        #     )
-
-        #     y = (
-        #         Text(
-        #             str(query[1]), 
-        #             font="DejaVu Sans Condensed", 
-        #             font_size=30
-        #         )
-        #         .next_to(comma,RIGHT,buff=0.15)
-        #         .align_to(x,DOWN)
-        #     )
-        #     animations.append(Write(y))
-
-        #     self.play(endPar.animate.next_to(y,RIGHT,buff=0.15))
-            
-        #     self.play(*animations)
-        #     self.wait(0.5)
-
-        #     # Create bounding rects in the Fenwick Tree matrix
-        #     rect_highlight = SurroundingRectangle(
-        #         dBitMatrix.get_mob_matrix()[query[0]][query[1]], 
-        #         color=GREEN, 
-        #         buff=0.1
-        #     )
-        #     self.play(Create(rect_highlight))
-
-        #     # Highlight BIT value in the Fenwick Tree matrix
-        #     self.play(
-        #         big_tree[query[0]-1].animate.highlight(GREEN),
-        #         small_trees[query[0]-1][query[1]-1].animate.highlight(GREEN),
-        #         run_time=0.5
-        #     )
-        #     self.wait(0.25)
-
-        #     # add sum to partial sums
-        #     sumText = (
-        #         Text(
-        #             str(query[2]), 
-        #             font="DejaVu Sans Condensed", 
-        #             font_size=30
-        #         )
-        #         .move_to(partialSums.get_center(),ORIGIN)
-        #         .align_to(partialSums,RIGHT)
-        #         .shift(RIGHT*0.58)
-        #     )
-        #     sums_list.append(sumText)
-
-        #     # Pre-move the end bracket to the right of the sum text to avoid overlap but keep y alignment
-        #     if len(sums_list) > 1:
-        #         sumText.move_to(sums_list[-1].get_bottom(),UP).align_to(sums_list[-1],LEFT).shift(DOWN*0.2)
-        #         comma_list.append(
-        #             Text(
-        #                 ",", 
-        #                 font="DejaVu Sans Condensed", 
-        #                 font_size=30
-        #             )
-        #             .next_to(sums_list[-2],RIGHT,buff=0.15)
-        #             .align_to(sums_list[-2],DOWN)
-        #         )
-        #         self.play(
-        #             AnimationGroup(
-        #                 endBracket.animate.next_to(sums_list[-1],RIGHT,buff=0.15)
-        #                     .align_to(sums_list[-1],DOWN)
-        #                     .shift(DOWN*0.05),
-        #                 Write(comma_list[-1]), 
-        #                 lag_ratio=0.6
-        #             )
-        #         )
-        #         self.play(Write(sumText))
-        #     else:  
-        #         self.play(endBracket.animate.next_to(sumText,RIGHT,buff=0.15).align_to(partialSums,DOWN))
-        #         self.play(Write(sumText))
-
-        #     self.wait(0.25)
-
-            
-
-        # # Final cleanup and write sum
-        # finalSumText = (
-        #     Text(
-        #         "Sum: ", 
-        #         font="DejaVu Sans Condensed", 
-        #         weight=SEMIBOLD,
-        #         font_size=30
-        #     )
-        #     .move_to(sums_list[-1].get_bottom(),UP)
-        #     .align_to(partialSums,LEFT)
-        #     .shift(DOWN*0.9)
-        # )
-        # finalSum = (
-        #     Text(
-        #         str(ops[0]), 
-        #         font="DejaVu Sans Condensed", 
-        #         weight=SEMIBOLD, 
-        #         font_size=30
-        #     )
-        #     .next_to(finalSumText,RIGHT,buff=0.15)
-        #     .align_to(finalSumText,DOWN)
-        # )
-
-        # self.play(
-        #     AnimationGroup(
-        #         Write(finalSumText), 
-        #         Write(finalSum), 
-        #         lag_ratio=0.4
-        #     )
-        # )
-        # self.wait(2)
-        
-        # # Clean up
-        # self.play(Unwrite(fullQuery), 
-        #           Unwrite(queryText),
-        #           Unwrite(comma), 
-        #           Unwrite(x),
-        #           Unwrite(y),
-        #           Unwrite(endPar), 
-        #           Unwrite(partialSums), 
-        #           Unwrite(endBracket), 
-        #           Uncreate(area_base_rect), 
-        #           Uncreate(rect_highlight),
-        #           Unwrite(finalSumText), 
-        #           Unwrite(finalSum), 
-        #           *[Unwrite(sum) for sum in sums_list], 
-        #           *[Unwrite(comma) for comma in comma_list],
-        #           *[box.animate.unhighlight() for box in big_tree],
-        #           *[innerbox.animate.unhighlight() for box in small_trees for innerbox in box],
-        #           )
-        # self.wait(1.5)
-        # """
-        # QUERY END
-        # """
