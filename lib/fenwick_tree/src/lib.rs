@@ -2,7 +2,7 @@ use pyo3::{prelude::*, types::{PyList, PyString}};
 use std::fs;
 use std::io::prelude::*;
 use rayon::{iter::Update, option, prelude::*, string};
-use ndarray::{Array, ArrayBase, ArrayD, ArrayViewD, Dim, IxDyn, IxDynImpl, OwnedRepr};
+use ndarray::{Array, ArrayBase, ArrayD, ArrayView, ArrayViewD, ArrayViewMut, Dim, IxDyn, IxDynImpl, OwnedRepr};
 use numpy::{IntoPyArray, PyArray, PyArrayDyn, PyArrayMethods, PyReadonlyArrayDyn, ToPyArray};
 
 /// A Python module implemented in Rust.
@@ -209,22 +209,7 @@ Python::with_gil(|py| {
         });
  */
 
- fn fill_tree(dim: i32, inp: Array<i64,IxDyn>, position: Vec<i32>, tree: &mut NdFenwick) -> Array<i64, IxDyn> {
-    if dim == 1 {
-        for i in 0..inp.shape()[0] {
-            let mut temp_pos = position.clone();
-            temp_pos.push(i as i32);
-            tree.update(temp_pos, inp[i as usize]);
-        }
-    }
-
-    for i in 0..inp.shape().len() {
-        let mut temp_pos = position.clone();
-        temp_pos.push(i as i32);
-        tree.tree = fill_tree(dim-1, inp.index_axis(ndarray::Axis(0), i).to_owned(), temp_pos, tree);
-    }
-    return tree.tree.clone();
-}
+ 
 
 
 /* 
@@ -251,28 +236,42 @@ fn wrapped_sum_query(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
 
 //TODO: Figure out how to make the while loop length check correctly and apply the same to inp on fill_tree
 
+fn fill_tree(dim: i32, inp: ArrayView<i64,IxDyn>, position: Vec<i32>, tree: &mut NdFenwick) -> Array<i64, IxDyn> {
+    if dim == 1 {
+        inp.iter().enumerate().for_each(|(i, &val)| {
+            let mut temp_pos = position.clone();
+            temp_pos.push(i as i32);
+            tree.update(temp_pos, val);
+        });
+    } else {
+            inp.axis_iter(ndarray::Axis(0)).enumerate().for_each(|(i, subview)| {
+                let mut temp_pos = position.clone();
+                temp_pos.push(i as i32);
+                fill_tree(dim - 1, subview, temp_pos, tree);
+            });
+    }
+    return tree.tree.clone();
+}
+
+
 #[pymethods]
 impl NdFenwick {
     // takes a python list as input and checks if its a i32 or a list    
     fn update(&mut self, position: Vec<i32>, val: i64) {
-        fn update_helper(position: &Vec<i32>, val: i64, tree: &mut Array<i64, IxDyn>) -> Array<i64, IxDyn> {
+        fn update_helper(position: &[i32], val: i64, tree: &mut ArrayViewMut<i64, IxDyn>) {
             let mut dimension = position[0];
             while dimension < tree.shape()[0] as i32 {
                 if position.len() != 1 {
-                    let updated_subtree = update_helper(&position[1..].to_vec(), val, &mut tree.index_axis_mut(ndarray::Axis(0), dimension as usize).to_owned());
-                    tree.index_axis_mut(ndarray::Axis(0), dimension as usize).assign(&updated_subtree);
+                    update_helper(&position[1..], val, &mut tree.index_axis_mut(ndarray::Axis(0), dimension as usize));
                 } else {
                     tree[dimension as usize] += val;
                 }
-;
                 dimension += dimension & -dimension;
             }
-            return tree.clone();
         }
 
         let position: Vec<i32> = position.iter().map(|x| x + 1).collect();
-        
-        self.tree = update_helper(&position, val, &mut self.tree);
+        update_helper(&position, val, &mut self.tree.view_mut());
     }
 
     #[new]
@@ -287,7 +286,7 @@ impl NdFenwick {
         
         let mut nd_fenwick = NdFenwick { tree, dim, size };
 
-        nd_fenwick.tree = fill_tree(dim, inp.to_owned(), Vec::new(), &mut nd_fenwick);
+        nd_fenwick.tree = fill_tree(dim, inp, Vec::new(), &mut nd_fenwick);
 
         return nd_fenwick;
     }
@@ -301,20 +300,26 @@ impl NdFenwick {
         wrapped_sum_query(&position, &self.tree)
     }
 
-    fn range_sum_query(&self, point1: Vec<i32>, point2: Vec<i32>) -> Option<i64> {
-        if point1.len() != point2.len() ||
-           point1.len() != self.dim as usize || 
-           point2.len() != self.dim as usize {
+    /*
+        Calculates the sum of the elements in the range [point1, point2]
+        point1 and point2 are vectors of the same length as the dimension of the tree
+        The function returns None if the dimensions of the points do not match the dimensions of the tree
+        Currently only supports 1D and 2D trees for all other dimensions it will return None
+     */
+    fn range_sum_query(&self, start: Vec<i32>, end: Vec<i32>) -> Option<i64> {
+        if start.len() != end.len() ||
+           start.len() != self.dim as usize || 
+           end.len() != self.dim as usize {
             return None;
         }
 
         match self.dim {
-            1 => return Some(self.sum_query(point2) - self.sum_query(point1)),
+            1 => return Some(self.sum_query(end) - self.sum_query(start)),
             2 => {
-                let s1 = self.sum_query(point2.clone());
-                let s2 = self.sum_query(vec![point2[0], point1[1]-1]);
-                let s3 = self.sum_query(vec![point1[0]-1, point2[1]]);
-                let s4 = self.sum_query(point1.into_iter().map(|x| x-1).collect());
+                let s1 = self.sum_query(end.clone());
+                let s2 = self.sum_query(vec![end[0], start[1]-1]);
+                let s3 = self.sum_query(vec![start[0]-1, end[1]]);
+                let s4 = self.sum_query(start.into_iter().map(|x| x-1).collect());
                 
                 return Some(s1 - s2 - s3 + s4);
             },

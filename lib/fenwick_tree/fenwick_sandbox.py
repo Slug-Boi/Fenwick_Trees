@@ -1,3 +1,5 @@
+import time
+import MatrixGenerator as mg
 import fenwick_tree
 import numpy as np
 # This file is used as a playground file to test the FenwickTree class it does not test the library 
@@ -24,6 +26,16 @@ import numpy as np
 
 # print(newtree.get_sum_indices(3))
 
-fenwick_tree = fenwick_tree.NdFenwick(np.array([[1,2],[3,4]]),2)
 
-print(fenwick_tree.get_tree())
+data = mg.create_random_ndmatrix((1000,1000), (0, 10))
+
+starttime = time.time()
+fenwick_tree = fenwick_tree.NdFenwick(np.array(data,dtype=int), 2)
+stoptime = time.time()
+
+
+print(stoptime - starttime)
+# print(fenwick_tree.sum_query([1,2]))
+
+# print(fenwick_tree.range_sum_query([0,0],[1,1]))
+# fenwick_tree.range_sum_query
