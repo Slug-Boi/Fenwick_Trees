@@ -127,74 +127,28 @@ class QueryUpdateTwoDBIT(Scene):
             .to_edge(UP)
             .shift(DOWN*0.5+LEFT*0.3)
         )
-        # queryText = (
-        #     Text(
-        #         "Sub-Query: (", 
-        #         font="DejaVu Sans Condensed", 
-        #         font_size=30
-        #     )
-        #     .to_edge(UP)
-        #     .shift(DOWN*1.5+LEFT*0.8)
-        # )
-        # comma = (
-        #     Text(
-        #         ",", 
-        #         font="DejaVu Sans Condensed", 
-        #         font_size=30
-        #     )
-        #     .next_to(queryText,RIGHT)
-        # )
-        # endPar = (
-        #     Text(
-        #         ")", 
-        #         font="DejaVu Sans Condensed", 
-        #         font_size=30
-        #     )
-        #     .next_to(comma,RIGHT)
-        # )
-        # partialSums = (
-        #     Text(
-        #         "Partial Sums: [", 
-        #         font="DejaVu Sans Condensed", 
-        #         font_size=30
-        #     )
-        #     .move_to(queryText.get_bottom(),UP)
-        #     .align_to(queryText,LEFT)
-        #     .shift(DOWN*0.4)
-        # )
-        # endBracket = (
-        #     Text(
-        #         "]", 
-        #         font="DejaVu Sans Condensed", 
-        #         font_size=30
-        #     )
-        #     .next_to(partialSums,RIGHT)
-        # )
 
 
         # Write static text items 
         ops = bit.SquareSumPositions(position1, position2)
         result, ops = ops[0], ops[1:]
         self.play(Write(fullQuery))
-        # ops = bit.getSumPositions(2, 1)
-        # self.play(Write(fullQuery),Write(queryText), Write(endPar))
-        # self.wait(0.25)
-        # self.play(Write(partialSums), Write(endBracket))
 
         # Create bounding rect in the base matrix
-        
         rows = [item for sublist in [base_mat.get_mob_matrix()[i][position1[1]:position2[1]+1] for i in range(position1[0], position2[0]+1)] for item in sublist]
-        area_base_rect = SurroundingRectangle(*rows, color=GREEN, buff=0.1)
+        area_base_rect = SurroundingRectangle(*rows, color=WHITE, buff=0.1)
         self.play(Create(area_base_rect))
         self.wait(0.25)       
-        squareColors = [BLUE, PINK, RED, YELLOW]
+
+        squareColors = [GREEN, PINK, RED, YELLOW]
         subSquares = []
         subQueriesText = []
+        subQueryResults = []
         for color, square in zip(squareColors, ops):
             # Create and write sub query text
             subQueryText = (
                 Text(
-                    f"Query({square[0], square[1]}) = ",
+                    f"Query({square[0]}, {square[1]}) = ",
                     font="DejaVu Sans Condensed",
                     font_size = 30,
                     color=color,
@@ -219,4 +173,45 @@ class QueryUpdateTwoDBIT(Scene):
             subSquares.append(subQuerySquare)
             self.play(Create(subQuerySquare))
             self.wait(0.5)
+            
+            # Batch show indecies used for sub-query
+            _, sub_ops = bit.getSumPositions(square[0], square[1])
+            matrixSquares = []
+            treePosition = []
+            for op in sub_ops:
+                treePosition.append((big_tree[op[0]-1], small_trees[op[0]-1][op[1]-1]))
+                item = dBitMatrix.get_mob_matrix()[op[0]][op[1]]
+                matrixSquares.append(SurroundingRectangle(item, color=color, buff=0.1))
+            self.play(
+                *[Create(square) for square in matrixSquares],
+                *[position[0].animate.highlight(color) for position in treePosition],
+                *[position[1].animate.highlight(color) for position in treePosition]
+                )
+            self.wait(0.4)
+            
+            # Show result of sub query
+            subQueryResult = (
+                Text(
+                    str(square[2]),
+                    font=subQueryText.font,
+                    font_size=subQueryText.font_size,
+                    color=color,
+                    stroke_color=color
+                )
+                .next_to(subQueryText, RIGHT, buff=0.19)
+                .align_to(subQueryText, UP)
+            )
 
+            self.play(Write(subQueryResult), run_time=0.7)
+            subQueryResults.append(subQueryResult)
+            self.wait(0.5)
+            
+            # Clean up
+            self.play(
+                *[Uncreate(square) for square in matrixSquares],
+                *[position[0].animate.unhighlight() for position in treePosition],
+                *[position[1].animate.unhighlight() for position in treePosition]
+            )
+            self.wait(0.1)
+        
+        self.wait(2)
