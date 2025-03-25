@@ -27,7 +27,7 @@ import numpy as np
 # print(newtree.get_sum_indices(3))
 
 
-data = mg.create_random_ndmatrix((2000,2000), (0, 10))
+data = mg.create_random_ndmatrix((5000,5000), (0, 10))
 
 starttime = time.time()
 fenwick_tree = fenwick_tree.NdFenwick(np.array(data,dtype=int), 2)
@@ -35,7 +35,8 @@ stoptime = time.time()
 
 
 print(stoptime - starttime)
-# print(fenwick_tree.sum_query([1,2]))
+#print(fenwick_tree.get_tree())
+#print(fenwick_tree.sum_query([1,0]))
 
 # print(fenwick_tree.range_sum_query([0,0],[1,1]))
 # fenwick_tree.range_sum_query

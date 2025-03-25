@@ -236,33 +236,48 @@ fn wrapped_sum_query(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
 
 
 // TODO: Figure out a faster way of computing things based on the temp position vector. The constant vector cloning and creation is probably slowing down the code a lot
-fn fill_tree(dim: i32, inp: ArrayView<i64,IxDyn>, position: Vec<i32>, tree: &mut NdFenwick) -> Array<i64, IxDyn> {
+fn fill_tree(dim: i32, inp: ArrayView<i64,IxDyn>, mut position: Vec<i32>, tree: &mut NdFenwick) -> Array<i64, IxDyn> {
     if dim == 1 {
+        // Reserve space for one more element to reduce reallocations
+        position.reserve(1);
+        
         inp.iter().enumerate().for_each(|(i, &val)| {
-            let mut temp_pos = position.clone();
-            temp_pos.push(i as i32);
-            tree.update(temp_pos, val);
+            position.push(i as i32);
+            tree.update(position.clone(), val);
+            position.pop(); // Reuse the same Vec
         });
     } else {
-            inp.axis_iter(ndarray::Axis(0)).enumerate().for_each(|(i, subview)| {
-                let mut temp_pos = position.clone();
-                temp_pos.push(i as i32);
-                fill_tree(dim - 1, subview, temp_pos, tree);
-            });
+        // Reserve space for one more element
+        position.reserve(1);
+        
+        inp.axis_iter(ndarray::Axis(0)).enumerate().for_each(|(i, subview)| {
+            position.push(i as i32);
+            fill_tree(dim - 1, subview, position.clone(), tree);
+            position.pop(); // Reuse the same Vec
+        });
     }
-    return tree.tree.clone();
+    tree.tree.clone()
 }
+
 
 
 #[pymethods]
 impl NdFenwick {
     // takes a python list as input and checks if its a i32 or a list    
     fn update(&mut self, position: Vec<i32>, val: i64) {
+             // Internal helper function that works with slices
         fn update_helper(position: &[i32], val: i64, tree: &mut ArrayViewMut<i64, IxDyn>) {
-            let mut dimension = position[0];
-            while dimension < tree.shape()[0] as i32 {
-                if position.len() != 1 {
-                    update_helper(&position[1..], val, &mut tree.index_axis_mut(ndarray::Axis(0), dimension as usize));
+            // Convert from 0-based to 1-based indexing
+            let mut dimension = position[0] + 1;
+            let len = tree.shape()[0] as i32;
+            
+            while dimension < len {
+                if position.len() > 1 {
+                    update_helper(
+                        &position[1..], 
+                        val, 
+                        &mut tree.index_axis_mut(ndarray::Axis(0), dimension as usize)
+                    );
                 } else {
                     tree[dimension as usize] += val;
                 }
@@ -270,7 +285,7 @@ impl NdFenwick {
             }
         }
 
-        let position: Vec<i32> = position.iter().map(|x| x + 1).collect();
+        // No need to create a new Vec - just pass the slice directly
         update_helper(&position, val, &mut self.tree.view_mut());
     }
 
