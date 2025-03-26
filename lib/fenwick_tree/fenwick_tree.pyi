@@ -24,6 +24,18 @@ class NdFenwick:
         """
 
     @classmethod
+    def get_size(self) -> int:
+        """
+        Returns the size of the BIT
+        """
+
+    @classmethod
+    def get_dim(self) -> int:
+        """
+        Returns the number of dimensions of the Fenwick Tree
+        """
+
+    @classmethod
     def sum_query(self, position: list[int]) -> int:
         """
         Returns the sum of the elements from the origin to the specified position.
