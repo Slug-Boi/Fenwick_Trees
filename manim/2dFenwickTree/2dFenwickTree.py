@@ -105,7 +105,13 @@ class TwoDFenwick(Scene):
             )
 
         self.small_trees.arrange(UP, buff=1)
-        self.play(LaggedStart(*[FadeIn(tree) for tree in self.small_trees], lag_ratio=0.5), run_time=0.7)
+        self.play(
+            LaggedStart(
+                *[FadeIn(tree) for tree in self.small_trees], 
+                lag_ratio=0.5
+            ), 
+            run_time=0.7
+        )
         self.wait(0.75)
 
         big_tree_style = deepcopy(BoxTree.defaultStyle)
@@ -128,7 +134,13 @@ class TwoDFenwick(Scene):
         )
         self.play(FadeIn(big_tree), run_time=0.7)
         self.play(big_tree.animate.to_edge(LEFT), run_time=0.7)
-        self.play(self.small_trees.animate.move_to(big_tree.get_corner(DR),DL).shift(RIGHT*0.3), run_time=0.7)
+        self.play(
+            self.small_trees.animate.move_to(
+                big_tree.get_corner(DR),DL
+            )
+            .shift(RIGHT*0.3), 
+            run_time=0.7
+        )
         self.wait(1)
 
         fenwick_mat_label = (
@@ -180,13 +192,20 @@ class TwoDFenwick(Scene):
         operations = bit.CreatePositions()
 
         # Create codeblock to show shift operations
-        codeblock = Code(
-            code_file="updateShiftExample.py",
-            background="rectangle",
-            language="python",
-            tab_width=2,
-            add_line_numbers=False,
-        ).scale_to_fit_width((dBitMatrix.get_left()[0]-self.small_trees.get_right()[0])*0.95).next_to(self.small_trees,RIGHT,buff=0.38).align_to(self.small_trees,DOWN)
+        codeblock = (
+            Code(
+                code_file="updateShiftExample.py",
+                background="rectangle",
+                language="python",
+                tab_width=2,
+                add_line_numbers=False,
+            )
+            .scale_to_fit_width(
+                (dBitMatrix.get_left()[0]-self.small_trees.get_right()[0])*0.95
+            )
+            .next_to(self.small_trees,RIGHT,buff=0.38)
+            .align_to(self.small_trees,DOWN)
+        )
 
         # Create VGroup for highlight rect in the code block
         self.sliding_wins = VGroup()
@@ -203,7 +222,6 @@ class TwoDFenwick(Scene):
                 self.sliding_wins[-1].stretch_to_fit_height(self.sliding_wins[0].height)
                 self.sliding_wins[-1].align_to(line, DOWN)
                 self.sliding_wins[-1].shift(DOWN*(buffer/2))
-                # self.sliding_wins[-1].shift(DOWN*((self.sliding_wins[0].height - codeblock.code_lines[0].height)/2))
 
         self.play(FadeIn(codeblock))
 
@@ -248,9 +266,20 @@ class TwoDFenwick(Scene):
             .align_to(row_value,UP)
         )
         self.row_col_group = VGroup(row_text, row_value, col_text, col_value)
-        self.row_col_group.move_to(self.small_trees.get_right() + (row_col_center_dist/2)*RIGHT).to_edge(UP).shift(DOWN*0.7)
+        ( # Position group
+            self.row_col_group.move_to(
+                self.small_trees.get_right() + (row_col_center_dist/2)*RIGHT
+            )
+            .to_edge(UP)
+            .shift(DOWN*0.7)
+        )
 
-        self.play(Write(row_text), Write(row_value), Write(col_text), Write(col_value))
+        self.play(
+            Write(row_text), 
+            Write(row_value), 
+            Write(col_text), 
+            Write(col_value)
+        )
 
         self.add(self.sliding_wins)
 
@@ -300,8 +329,10 @@ class TwoDFenwick(Scene):
 
                         self.play(self.sliding_wins[0].animate.set_opacity(0.3))
                         self.wait(0.15)
-                        self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
-                                  self.sliding_wins[1].animate.set_opacity(0.3))
+                        self.play(
+                            *[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
+                            self.sliding_wins[1].animate.set_opacity(0.3)
+                        )
                         self.wait(0.15)
                         replacement_y = (
                             Text(
@@ -317,11 +348,15 @@ class TwoDFenwick(Scene):
                         self.row_col_group[-1].become(replacement_y)
 
                     # Highlight while loop_y <= matrix_size:
-                    self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
-                              self.sliding_wins[2].animate.set_opacity(0.3))
+                    self.play(
+                        *[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
+                        self.sliding_wins[2].animate.set_opacity(0.3)
+                    )
                     self.wait(0.15)
-                    self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins], 
-                              self.sliding_wins[3].animate.set_opacity(0.3))
+                    self.play(
+                        *[highlight.animate.set_opacity(0) for highlight in self.sliding_wins], 
+                        self.sliding_wins[3].animate.set_opacity(0.3)
+                    )
                     self.wait(0.1)
 
                     self.play(Create(bit_rect))
@@ -339,22 +374,35 @@ class TwoDFenwick(Scene):
                     self.play(FadeIn(new_obj),run_time=0.5)
 
                     # loop_y += (loop_y & -loop_y)
-                    self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
-                              self.sliding_wins[4].animate.set_opacity(0.3))
+                    self.play(
+                        *[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
+                        self.sliding_wins[4].animate.set_opacity(0.3)
+                    )
                     
 
-                    temp = self.math_animate(update[1], self.row_col_group[-1], self.row_col_group.get_center()+DOWN*0.75)
+                    temp = self.math_animate(
+                        update[1], 
+                        self.row_col_group[-1], 
+                        self.row_col_group.get_center()+DOWN*0.75
+                    )
                     self.row_col_group[-1] = temp
 
-                    self.play(big_tree[update[0]-1].animate.highlight(GREEN),
-                            self.small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN)
-                            )
+                    self.play(
+                        big_tree[update[0]-1].animate.highlight(GREEN),
+                        self.small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN)
+                    )
                     self.wait(0.15)
                     if update[1] + (update[1] & -(update[1])) > bit.matrix_size:
-                        self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins], 
-                                  self.sliding_wins[5].animate.set_opacity(0.3))
+                        self.play(
+                            *[highlight.animate.set_opacity(0) for highlight in self.sliding_wins], 
+                            self.sliding_wins[5].animate.set_opacity(0.3)
+                        )
                         self.wait(0.15)
-                        temp = self.math_animate(update[0], self.row_col_group[1], self.row_col_group.get_center()+DOWN*0.75)
+                        temp = self.math_animate(
+                            update[0], 
+                            self.row_col_group[1], 
+                            self.row_col_group.get_center()+DOWN*0.75
+                        )
                         self.row_col_group[1] = temp
                         self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins])
                         self.wait(0.15)
@@ -385,13 +433,23 @@ class TwoDFenwick(Scene):
                         buff=0.1
                     )
                     bit_rects.append(bit_rect)
-                    fadeout_bit_numbers.append(FadeOut(dBitMatrix.get_rows()[update[0]][update[1]], run_time=0.5))
+                    fadeout_bit_numbers.append(
+                        FadeOut(
+                            dBitMatrix.get_rows()[update[0]][update[1]], 
+                            run_time=0.5
+                        )
+                    )
                     big_unhighlights.append(big_tree[update[0]-1])
-                    small_unhighlights.append(self.small_trees[update[0]-1][update[1]-1])
-                    big_tree_batch_highlights.append(big_tree[update[0]-1].animate.highlight(GREEN))
-                    small_tree_batch_highlights.append(self.small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN))
+                    small_unhighlights.append(
+                        self.small_trees[update[0]-1][update[1]-1]
+                    )
+                    big_tree_batch_highlights.append(
+                        big_tree[update[0]-1].animate.highlight(GREEN)
+                    )
+                    small_tree_batch_highlights.append(
+                        self.small_trees[update[0]-1][update[1]-1].animate.highlight(GREEN)
+                    )
 
-                #self.play(*fadeout_bit_numbers)
                 self.play(*fadeout_bit_numbers)
                 for update in op[1]:
                     new_obj = (
@@ -403,10 +461,12 @@ class TwoDFenwick(Scene):
                         )
                     )
                     fadein_bit_numbers.append(FadeIn(new_obj, run_time=0.5))
-                self.play(*[Create(rect) for rect in bit_rects],
-                          *fadein_bit_numbers,
-                          *big_tree_batch_highlights,
-                          *small_tree_batch_highlights)
+                self.play(
+                    *[Create(rect) for rect in bit_rects],
+                    *fadein_bit_numbers,
+                    *big_tree_batch_highlights,
+                    *small_tree_batch_highlights
+                )
                 self.wait(0.8)
             
 
