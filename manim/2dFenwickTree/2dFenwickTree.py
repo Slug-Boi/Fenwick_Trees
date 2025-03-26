@@ -188,7 +188,22 @@ class TwoDFenwick(Scene):
             add_line_numbers=False,
         ).scale_to_fit_width((dBitMatrix.get_left()[0]-self.small_trees.get_right()[0])*0.95).next_to(self.small_trees,RIGHT,buff=0.38).align_to(self.small_trees,DOWN)
 
+        # Create VGroup for highlight rect in the code block
         self.sliding_wins = VGroup()
+        buffer = 0.025
+        for line in codeblock.code_lines:
+            self.sliding_wins.add(
+                SurroundingRectangle(line,buff=buffer)
+                .set_fill(YELLOW)
+                .set_opacity(0)
+                .stretch_to_fit_width(codeblock.background.width)
+                .align_to(codeblock.background, LEFT)
+            )
+            if len(self.sliding_wins) > 1:
+                self.sliding_wins[-1].stretch_to_fit_height(self.sliding_wins[0].height)
+                self.sliding_wins[-1].align_to(line, DOWN)
+                self.sliding_wins[-1].shift(DOWN*(buffer/2))
+                # self.sliding_wins[-1].shift(DOWN*((self.sliding_wins[0].height - codeblock.code_lines[0].height)/2))
 
         self.play(FadeIn(codeblock))
 
@@ -237,19 +252,6 @@ class TwoDFenwick(Scene):
 
         self.play(Write(row_text), Write(row_value), Write(col_text), Write(col_value))
 
-
-        for line in codeblock.code_lines:
-            self.sliding_wins.add(
-                SurroundingRectangle(line,buff=0.025)
-                .set_fill(YELLOW)
-                .set_opacity(0)
-                .stretch_to_fit_width(codeblock.background.get_width())
-                .align_to(codeblock.background, LEFT)
-            )
-            if len(self.sliding_wins) > 1:
-                self.sliding_wins[-1].stretch_to_fit_height(self.sliding_wins[0].get_height())
-                self.sliding_wins[-1].shift(DOWN*0.05)
-
         self.add(self.sliding_wins)
 
         shifted_objects = False
@@ -294,6 +296,8 @@ class TwoDFenwick(Scene):
 
                     # Highlight while x <= matrix_size:
                     if update[0] != previous_x:
+                        # self.play(FadeIn(codeblock.code_lines[]))
+
                         self.play(self.sliding_wins[0].animate.set_opacity(0.3))
                         self.wait(0.15)
                         self.play(*[highlight.animate.set_opacity(0) for highlight in self.sliding_wins],
