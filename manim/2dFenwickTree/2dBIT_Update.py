@@ -31,7 +31,13 @@ class TwoDFenwick(Scene):
             )
 
         self.small_trees.arrange(UP, buff=1)
-        self.play(LaggedStart(*[FadeIn(tree) for tree in self.small_trees], lag_ratio=0.5), run_time=0.7)
+        self.play(
+            LaggedStart(
+                *[FadeIn(tree) for tree in self.small_trees], 
+                lag_ratio=0.5
+            ), 
+            run_time=0.7
+        )
         self.wait(0.75)
 
         big_tree_style = deepcopy(BoxTree.defaultStyle)
@@ -53,7 +59,14 @@ class TwoDFenwick(Scene):
         )
         self.play(FadeIn(self.big_tree), run_time=0.7)
         self.play(self.big_tree.animate.to_edge(LEFT).shift(RIGHT*1.5), run_time=0.7)
-        self.play(self.small_trees.animate.move_to(self.big_tree.get_corner(DR),DL).shift(RIGHT*0.3), run_time=0.7)
+        self.play(
+            (
+                self.small_trees.animate
+                .move_to(self.big_tree.get_corner(DR),DL)
+                .shift(RIGHT*0.3)
+            ), 
+            run_time=0.7
+        )
         self.wait(1)
 
         fenwick_mat_label = (
@@ -99,11 +112,8 @@ class TwoDFenwick(Scene):
         Create(self.base_mat), 
         lag_ratio=0.2))
         self.wait(0.5)
-    
-        updatePosition = (1,2)
-        updateValue = 4
 
-        self.animateUpdate(updatePosition, updateValue)
+        self.animateUpdate((1,2), 4)
         self.wait(2)
 
         self.animateUpdate((0,1), -3)
@@ -147,7 +157,11 @@ class TwoDFenwick(Scene):
         small_unhighlights = []
         bit_rects = []
         for update in updates:
-            bit_rect = SurroundingRectangle(self.dBitMatrix.get_rows()[update[0]][update[1]], color=GREEN, buff=0.1)
+            bit_rect = SurroundingRectangle(
+                self.dBitMatrix.get_rows()[update[0]][update[1]], 
+                color=GREEN, 
+                buff=0.1
+            )
             bit_rects.append(bit_rect)
             big_unhighlights.append(self.big_tree[update[0]-1])
             small_unhighlights.append(self.small_trees[update[0]-1][update[1]-1])
