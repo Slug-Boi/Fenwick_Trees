@@ -65,7 +65,7 @@ class QueryUpdateTwoDBIT(Scene):
             # Otherwise manim can't combine the sub-renders 
             # into the full animation (for some reason)
             Text(
-                f"Fenwick Tree Array",
+                "Fenwick Tree Table",
                 weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36
@@ -90,7 +90,7 @@ class QueryUpdateTwoDBIT(Scene):
 
         base_mat_label = (
             Text(
-                "Input Array", 
+                "Input Table", 
                 weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36
@@ -141,7 +141,7 @@ class QueryUpdateTwoDBIT(Scene):
         rows = [item for sublist in [base_mat.get_mob_matrix()[i][position1[1]:position2[1]+1] for i in range(position1[0], position2[0]+1)] for item in sublist]
         area_base_rect = SurroundingRectangle(*rows, color=WHITE, buff=0.1)
         self.play(Create(area_base_rect))
-        self.wait(0.25)       
+        self.wait(0.25)
 
         squareColors = [GREEN, PINK, RED, YELLOW]
         subSquares = []
