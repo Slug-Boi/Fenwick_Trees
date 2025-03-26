@@ -34,7 +34,13 @@ class QueryUpdateTwoDBIT(Scene):
             )
 
         small_trees.arrange(UP, buff=1)
-        self.play(LaggedStart(*[FadeIn(tree) for tree in small_trees], lag_ratio=0.5), run_time=0.7)
+        self.play(
+            LaggedStart(
+                *[FadeIn(tree) for tree in small_trees], 
+                lag_ratio=0.5
+            ), 
+            run_time=0.7
+        )
         self.wait(0.75)
 
         big_tree_style = deepcopy(BoxTree.defaultStyle)
@@ -236,18 +242,42 @@ class QueryUpdateTwoDBIT(Scene):
 
         separation = 0.17
         minus1 = Text("-", font="DejaVu Sans Condensed", font_size=28)
-        self.play(subQueryResults[0].animate.next_to(resultText, RIGHT, buff=separation).align_to(resultText, DOWN))
+        self.play(
+            (
+                subQueryResults[0].animate
+                .next_to(resultText, RIGHT, buff=separation)
+                .align_to(resultText, DOWN)
+            )
+        )
         self.play(FadeIn(minus1.next_to(subQueryResults[0], RIGHT, buff=separation)))
 
         minus2 = minus1.copy()
-        self.play(subQueryResults[1].animate.next_to(minus1, RIGHT, buff=separation).align_to(resultText, DOWN))
+        self.play(
+            (
+                subQueryResults[1].animate
+                .next_to(minus1, RIGHT, buff=separation)
+                .align_to(resultText, DOWN)
+            )
+        )
         self.play(FadeIn(minus2.next_to(subQueryResults[1], RIGHT, buff=separation)))
 
         plus = Text("+", font="DejaVu Sans Condensed", font_size=20)
-        self.play(subQueryResults[2].animate.next_to(minus2, RIGHT, buff=separation).align_to(resultText, DOWN))
+        self.play(
+            (
+                subQueryResults[2].animate
+                .next_to(minus2, RIGHT, buff=separation)
+                .align_to(resultText, DOWN)
+            )
+        )
         self.play(FadeIn(plus.next_to(subQueryResults[2], RIGHT, buff=separation)))
 
-        self.play(subQueryResults[3].animate.next_to(plus, RIGHT, buff=separation).align_to(resultText, DOWN))
+        self.play(
+            (
+                subQueryResults[3].animate
+                .next_to(plus, RIGHT, buff=separation)
+                .align_to(resultText, DOWN)
+            )
+        )
 
         self.wait(0.5)
         # Colaps into final result
