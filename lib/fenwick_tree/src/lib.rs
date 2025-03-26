@@ -296,7 +296,7 @@ impl NdFenwick {
 
         // 1 index the tree in all dimensions and zero all values
         let tree: Array<i64, IxDyn> = Array::zeros(IxDyn(&inp.shape().iter().map(|x| *x+1 as usize).collect::<Vec<usize>>()));
-        let size = tree.len() as i32;
+        let size = inp.len() as i32;
         
         let mut nd_fenwick = NdFenwick { tree, dim, size };
 
