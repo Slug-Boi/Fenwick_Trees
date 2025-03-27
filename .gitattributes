@@ -1,2 +1,8 @@
 Makefile linguist-vendored
 *.d linguist-vendored
+*.lock linguist-vendored
+*.rmeta linguist-vendored
+*.dylib linguist-vendored
+*.rlib linguist-vendored
+*.bin linguist-vendored
+*.json linguist-vendored
