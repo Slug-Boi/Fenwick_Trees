@@ -66,13 +66,13 @@ class QueryUpdateTwoDBIT(Scene):
 
         fenwick_mat_label = (
             Text(
-                "Fenwick Tree Matrix", 
+                "BIT Table", 
                 weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36
             )
             .to_corner(UR)
-            .shift(LEFT*0.2)
+            .shift(LEFT*1.2)
         )
         dBitMatrix = (
             Matrix(bit.BIT)
@@ -91,7 +91,7 @@ class QueryUpdateTwoDBIT(Scene):
 
         base_mat_label = (
             Text(
-                "Base Matrix", 
+                "Input Table", 
                 weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36

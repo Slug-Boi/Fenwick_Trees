@@ -71,13 +71,13 @@ class QueryUpdateTwoDBIT(Scene):
             # Otherwise manim can't combine the sub-renders 
             # into the full animation (for some reason)
             Text(
-                "Fenwick Tree Table",
+                "BIT Table",
                 weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36
             )
             .to_corner(UR)
-            .shift(LEFT*0.2)
+            .shift(LEFT*1.2)
         )
         dBitMatrix = (
             Matrix(bit.BIT)

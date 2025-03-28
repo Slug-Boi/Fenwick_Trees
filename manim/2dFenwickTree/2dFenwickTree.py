@@ -145,13 +145,13 @@ class TwoDFenwick(Scene):
 
         fenwick_mat_label = (
             Text(
-                "Fenwick Tree Array", 
+                "BIT Table", 
                 weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36
             )
             .to_corner(UR)
-            .shift(LEFT*0.2)
+            .shift(LEFT*1.2)
         )
         dBitMatrix = (
             Matrix(bit.BIT)
@@ -168,7 +168,7 @@ class TwoDFenwick(Scene):
 
         base_mat_label = (
             Text(
-                "Input Array", 
+                "Input Table", 
                 weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36
