@@ -4,6 +4,7 @@ use std::io::prelude::*;
 use rayon::{iter::Update, option, prelude::*, string};
 use ndarray::{Array, ArrayBase, ArrayD, ArrayView, ArrayViewD, ArrayViewMut, Dim, IxDyn, IxDynImpl, OwnedRepr};
 use numpy::{IntoPyArray, PyArray, PyArrayDyn, PyArrayMethods, PyReadonlyArrayDyn, ToPyArray};
+use std::time::Instant;
 
 /// A Python module implemented in Rust.
 #[pymodule]
@@ -233,58 +234,47 @@ fn wrapped_sum_query(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
     query_helper(&position, &tree)
 }
 
+fn fill_tree(dim: i32, inp: ArrayView<i64, IxDyn>, position: &mut Vec<i32>, tree: &mut NdFenwick) {
+    let pos_index = position.len() - dim as usize;
 
-
-// TODO: Figure out a faster way of computing things based on the temp position vector. The constant vector cloning and creation is probably slowing down the code a lot
-fn fill_tree(dim: i32, inp: ArrayView<i64,IxDyn>, mut position: Vec<i32>, tree: &mut NdFenwick) -> Array<i64, IxDyn> {
     if dim == 1 {
-        // Reserve space for one more element to reduce reallocations
-        position.reserve(1);
-        
         inp.iter().enumerate().for_each(|(i, &val)| {
-            position.push(i as i32);
-            tree.update(position.clone(), val);
-            position.pop(); // Reuse the same Vec
+            position[pos_index] = i as i32;
+            update_helper(position, val, &mut tree.tree.view_mut());
         });
     } else {
-        // Reserve space for one more element
-        position.reserve(1);
-        
-        inp.axis_iter(ndarray::Axis(0)).enumerate().for_each(|(i, subview)| {
-            position.push(i as i32);
-            fill_tree(dim - 1, subview, position.clone(), tree);
-            position.pop(); // Reuse the same Vec
-        });
+        for (i, subview) in inp.axis_iter(ndarray::Axis(0)).enumerate() {
+            position[pos_index] = i as i32;
+            fill_tree(dim - 1, subview, position, tree);
+        }
     }
-    tree.tree.clone()
 }
 
 
+    // Internal helper function that works with slices
+fn update_helper(position: &[i32], val: i64, tree: &mut ArrayViewMut<i64, IxDyn>) {
+    // Convert from 0-based to 1-based indexing
+    let mut dimension = position[0] + 1;
+    let len = tree.shape()[0] as i32;
+    
+    while dimension < len {
+        if position.len() > 1 {
+            update_helper(
+                &position[1..], 
+                val, 
+                &mut tree.index_axis_mut(ndarray::Axis(0), dimension as usize)
+            );
+        } else {
+            tree[dimension as usize] += val;
+        }
+        dimension += dimension & -dimension;
+    }
+}
 
 #[pymethods]
 impl NdFenwick {
     // takes a python list as input and checks if its a i32 or a list    
     fn update(&mut self, position: Vec<i32>, val: i64) {
-             // Internal helper function that works with slices
-        fn update_helper(position: &[i32], val: i64, tree: &mut ArrayViewMut<i64, IxDyn>) {
-            // Convert from 0-based to 1-based indexing
-            let mut dimension = position[0] + 1;
-            let len = tree.shape()[0] as i32;
-            
-            while dimension < len {
-                if position.len() > 1 {
-                    update_helper(
-                        &position[1..], 
-                        val, 
-                        &mut tree.index_axis_mut(ndarray::Axis(0), dimension as usize)
-                    );
-                } else {
-                    tree[dimension as usize] += val;
-                }
-                dimension += dimension & -dimension;
-            }
-        }
-
         // No need to create a new Vec - just pass the slice directly
         update_helper(&position, val, &mut self.tree.view_mut());
     }
@@ -300,7 +290,9 @@ impl NdFenwick {
         
         let mut nd_fenwick = NdFenwick { tree, dim, size };
 
-        nd_fenwick.tree = fill_tree(dim, inp, Vec::new(), &mut nd_fenwick);
+        let mut slice: Vec<i32> = vec![0; dim as usize];
+
+        fill_tree(dim, inp, &mut slice, &mut nd_fenwick);
 
         return nd_fenwick;
     }
