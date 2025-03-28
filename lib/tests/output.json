@@ -1,0 +1,104 @@
+{
+    "rand 0": {
+        "dimension": [
+            18,
+            2,
+            19
+        ],
+        "num_tests": 3,
+        "random_range": [
+            -10,
+            10
+        ],
+        "tests": {
+            "0": {
+                "query_position": [
+                    17,
+                    1,
+                    12
+                ],
+                "linear_time": 0.0,
+                "linear_result": -327,
+                "fenwick_time": 0.0,
+                "fenwick_result": -327
+            },
+            "1": {
+                "query_position": [
+                    16,
+                    1,
+                    1
+                ],
+                "linear_time": 0.0,
+                "linear_result": -14,
+                "fenwick_time": 0.0,
+                "fenwick_result": -14
+            },
+            "2": {
+                "query_position": [
+                    5,
+                    1,
+                    12
+                ],
+                "linear_time": 0.0,
+                "linear_result": -57,
+                "fenwick_time": 0.0,
+                "fenwick_result": -57
+            }
+        },
+        "linear_avg": 0.0,
+        "fenwick_avg": 0.0,
+        "linear_total_time": 0.0,
+        "fenwick_total_time": 0.0
+    },
+    "rand 1": {
+        "dimension": [
+            12,
+            14,
+            4
+        ],
+        "num_tests": 3,
+        "random_range": [
+            -10,
+            10
+        ],
+        "tests": {
+            "0": {
+                "query_position": [
+                    1,
+                    10,
+                    3
+                ],
+                "linear_time": 0.0,
+                "linear_result": -35,
+                "fenwick_time": 0.0,
+                "fenwick_result": -35
+            },
+            "1": {
+                "query_position": [
+                    3,
+                    4,
+                    1
+                ],
+                "linear_time": 0.0,
+                "linear_result": -52,
+                "fenwick_time": 0.0,
+                "fenwick_result": -52
+            },
+            "2": {
+                "query_position": [
+                    10,
+                    9,
+                    1
+                ],
+                "linear_time": 0.0,
+                "linear_result": -74,
+                "fenwick_time": 0.0,
+                "fenwick_result": -74
+            }
+        },
+        "linear_avg": 0.0,
+        "fenwick_avg": 0.0,
+        "linear_total_time": 0.0,
+        "fenwick_total_time": 0.0
+    }
+}
