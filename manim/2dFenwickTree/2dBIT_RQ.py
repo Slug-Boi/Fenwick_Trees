@@ -129,10 +129,10 @@ class QueryUpdateTwoDBIT(Scene):
         fullQuery = (
             Text(
                 f"Query({position1}, {position2})", 
-                font="DejaVu Sans Condensed", 
-                font_size=30, 
+                font="DejaVu Sans Condensed",
                 weight=SEMIBOLD
             )
+            .scale(0.56)
             .to_edge(UP)
             .shift(DOWN*0.5+LEFT*0.3)
         )
@@ -159,10 +159,10 @@ class QueryUpdateTwoDBIT(Scene):
                 Text(
                     f"Query({square[0]}, {square[1]}) =",
                     font="DejaVu Sans Condensed",
-                    font_size = 28,
                     color=color,
                     stroke_color=color
                 )
+                .scale(0.54)
             )
             if subQueriesText:
                 subQueryText.next_to(subQueriesText[-1], DOWN)
@@ -203,10 +203,10 @@ class QueryUpdateTwoDBIT(Scene):
                 Text(
                     str(square[2]),
                     font=subQueryText.font,
-                    font_size=subQueryText.font_size,
                     color=color,
                     stroke_color=color
                 )
+                .scale(0.54)
                 .next_to(subQueryText, RIGHT, buff=0.19)
                 .align_to(subQueryText, UP)
             )
@@ -229,8 +229,8 @@ class QueryUpdateTwoDBIT(Scene):
             Text(
                 "Result =",
                 font="DejaVu Sans Condensed",
-                font_size=28,
             )
+            .scale(0.54)
             .next_to(subQueriesText[-1], DOWN, buff=1)
             .align_to(fullQuery, LEFT)
         )
@@ -241,7 +241,7 @@ class QueryUpdateTwoDBIT(Scene):
         # Move sub results into calculation
 
         separation = 0.17
-        minus1 = Text("-", font="DejaVu Sans Condensed", font_size=28)
+        minus1 = Text("-", font="DejaVu Sans Condensed").scale(0.54)
         self.play(
             (
                 subQueryResults[0].animate
@@ -261,7 +261,7 @@ class QueryUpdateTwoDBIT(Scene):
         )
         self.play(FadeIn(minus2.next_to(subQueryResults[1], RIGHT, buff=separation)))
 
-        plus = Text("+", font="DejaVu Sans Condensed", font_size=20)
+        plus = Text("+", font="DejaVu Sans Condensed").scale(0.45)
         self.play(
             (
                 subQueryResults[2].animate
@@ -285,9 +285,9 @@ class QueryUpdateTwoDBIT(Scene):
             Text(
                 str(result),
                 font=resultText.font,
-                font_size=resultText.font_size,
                 weight=resultText.weight
             )
+            .scale(0.54)
             .next_to(resultText, RIGHT, buff=separation)
             .align_to(resultText, DOWN)
         )
