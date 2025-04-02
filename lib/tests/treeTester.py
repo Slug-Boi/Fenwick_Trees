@@ -112,7 +112,7 @@ def twoDFenwickSums(testMatrix, queryAmount, MatrixDimensions: tuple[int], verbo
     
     for i, queryPosition in enumerate(queryPositions):
         linearStart = current_milli_time()
-        correct = MatrixSum.NDSumArray(testMatrix, 2, [0,0], queryPosition)
+        correct = MatrixSum.linear_matrix_sum(testMatrix, [0,0], queryPosition)
         linearEnd = current_milli_time()
         lin_times[i] = linearEnd - linearStart
         treeStart = current_milli_time()
@@ -166,8 +166,8 @@ if __name__ == "__main__":
 
     #TODO: add fine grain verbose print to only print some tests
     random_range = (-10, 10)
-    max_dimension_size = 20
-    min_dimension_size = 5
+    max_dimension_size = 5000
+    min_dimension_size = 500
     
     matrices = generateData(random_range, max_dimension_size, min_dimension_size)
     for testMatrix in matrices:
@@ -177,7 +177,7 @@ if __name__ == "__main__":
             print("Matrix dimensions:", matrix_dimension)
         twoDFenwickSums(testMatrix,3 ,matrix_dimension, args.verbose, args.json)
 
-        nd_dim = [randint(1,20), randint(1,20),randint(1,20)]
+        nd_dim = [randint(1,200), randint(1,200),randint(1,200)]
 
         if args.verbose:
             print("Testing N-D Fenwick Tree")
