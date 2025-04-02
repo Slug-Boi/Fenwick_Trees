@@ -14,13 +14,6 @@ fn fenwick_tree(m: &Bound<'_, PyModule>) -> PyResult<()> {
     Ok(())
 }
 
-#[derive(FromPyObject)]
-    enum SupportedArray<'py> {
-        F64(Bound<'py, PyArray<f64, IxDyn>>),
-        I64(Bound<'py, PyArray<i64, IxDyn>>),
-    }
-
-
 // Current code is heavily based on the implementation of Fenwick Tree in GeeksforGeeks
 // https://www.geeksforgeeks.org/binary-indexed-tree-or-fenwick-tree-2/
 // https://www.geeksforgeeks.org/fenwick-tree-for-competitive-programming/?ref=ml_lbp
@@ -50,7 +43,7 @@ impl FenwickTree {
         index = index + 1;
         index_check(index, self.tree.len());
 
-        while index <= (self.tree.len()-1) as i32 {
+        while index < (self.tree.len()) as i32 {
             self.tree[index as usize] += value;
             index += index & (-index);
         }
@@ -234,7 +227,7 @@ fn wrapped_sum_query(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
     query_helper(&position, &tree)
 }
 
-fn fill_tree(dim: i32, inp: ArrayView<i64, IxDyn>, position: &mut Vec<i32>, tree: &mut NdFenwick) {
+fn fill_tree(dim: i32, inp: ArrayView<i64, IxDyn>, position: &mut [i32], tree: &mut NdFenwick) {
     let pos_index = position.len() - dim as usize;
 
     if dim == 1 {
