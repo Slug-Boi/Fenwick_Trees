@@ -1,4 +1,5 @@
 /target
+target-rust-analyzer
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
