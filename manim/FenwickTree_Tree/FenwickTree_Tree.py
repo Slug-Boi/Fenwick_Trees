@@ -8,22 +8,6 @@ from copy import deepcopy
 global_font = "DejaVu Sans Condensed"
 arr = [3, 2, -3, 6, 5, 4, -2, 7]
 
-# TODO: Move this out into a utils module
-def plus_sign_edge(edge, up_gap=0):
-    plus = Text("+", stroke_width=3)
-    plus.z_index = 1
-    edge_cen = edge.get_center()
-    edge_height = edge.get_height()/4
-    plus.move_to(edge_cen).shift(UP*edge_height)
-    return plus
-
-# TODO: add a 2 box input method which takes the distance between their centers
-def plus_sign_manual(box, elevate, gap=0.135, up_gap=0):
-    plus = Text("+", stroke_width=3)
-    plus.z_index = 1
-    plus.move_to(box.get_center()+RIGHT*(box.width/2+gap)+UP*elevate*up_gap)
-    return plus
-
 def binary_index(index,b_len) -> str:
     return "{0:0{b_len}b}".format(index, b_len=b_len)
 
@@ -56,6 +40,7 @@ class FenwickTree_Tree(Scene):
 
         # fenwick tree
         fw = FenwickTree(arr)
+        
         # Fenwick Tree Array
         fta = fw.get_tree()
         print(fta)
@@ -76,7 +61,6 @@ class FenwickTree_Tree(Scene):
 
         #TODO change to range
         for i in range(len(arr)):
-            pluses = []
 
             index = i+1
             lvl = tree_level(index)
@@ -88,15 +72,9 @@ class FenwickTree_Tree(Scene):
 
             if lvl > 0:
                 z = i
-                #pluses.append(plus_sign(i-1, dsa_arr, 0.5,0.2))
                 while z > 0:
-                    if tree_level(z) < lvl:
-                        pluses.append(plus_sign_manual(dsa_arr[z-1], tree_level(z)-1, box_distance+0.5))
                     z -= -z & z
 
-                if pluses:
-                        self.play(*[Write(plus) for plus in pluses])
-                        self.wait(0.5)
 
             anim_group = AnimationGroup(dsa_arr[i].animate.shift(UP*UPLEVEL*lvl), bin_indices[i].animate.shift(UP*UPLEVEL*lvl), lag_ratio=0.025)
             self.play(anim_group)
@@ -111,8 +89,6 @@ class FenwickTree_Tree(Scene):
             if lvl > 0:
                 self.play(Write(dsa_arr[i].submobjects[1]))
             
-            if pluses:
-                self.play(*[Unwrite(plus) for plus in pluses])
             
         
         self.wait(0.5)
@@ -247,26 +223,27 @@ class FenwickTree_Tree(Scene):
 
             edge_highlight = []
             boxes_highlight = []
-            plus_edge_highlight = []
 
             for index in highlight_indices:
                 boxes_highlight.append(mgraph[str(index)])
                 if(str(index), str(prevIndex)) in mgraph:
                     edge_highlight.append(mgraph[(str(index), str(prevIndex))])
-                    plus_edge_highlight.append(plus_sign_edge(mgraph[(str(index), str(prevIndex))]))
                 prevIndex = index
 
             self.play(
                 *[box.animate.highlight(PINK) for box in boxes_highlight], 
                 *[edge.animate.highlight(PINK) for edge in edge_highlight],
-                *[Write(plus) for plus in plus_edge_highlight]
                 )
-            self.wait(1)
+            self.wait(0.75)
+            equal = Text(f"= {fw.sum(i-1)}").scale(0.75).next_to(queryParen, RIGHT)
+            self.play(Write(equal))
+            self.wait(0.3)
+
             if boxes_highlight:
                 self.play(*[box.animate.unhighlight() for box in boxes_highlight],
                            *[edge.animate.unhighlight() for edge in edge_highlight],
-                           *[Unwrite(plus) for plus in plus_edge_highlight],
-                           Unwrite(sum_index)
+                           Unwrite(sum_index),
+                           Unwrite(equal)
                            )
             self.resetPartialSums()
 
@@ -344,6 +321,7 @@ class FenwickTree_Tree(Scene):
             updateIndex += updateIndex & -updateIndex
         
         self.play(Unwrite(updateText), *[mgraph[str(node)].animate.unhighlight() for node in highlights])
+
 
         """
         Range Query
