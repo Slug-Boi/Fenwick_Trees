@@ -26,15 +26,20 @@ import numpy as np
 
 # print(newtree.get_sum_indices(3))
 
+tree = fenwick_tree.BIT([4,8,5,2,6,1,0,8])
+print(tree.size)
 
-data = mg.create_random_ndmatrix((5000,5000), (0, 10))
+
+
+
+data = mg.create_random_ndmatrix((500,500), (0, 10))
 
 starttime = time.time()
-fenwick_tree = fenwick_tree.NdFenwick(np.array(data,dtype=int), 2)
+fenwick_tree = fenwick_tree.NdBIT(np.array(data,dtype=int), 2)
 stoptime = time.time()
 
 
-print(stoptime - starttime)
+# print(stoptime - starttime)
 #print(fenwick_tree.get_tree())
 #print(fenwick_tree.sum_query([1,0]))
 

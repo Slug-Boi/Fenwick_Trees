@@ -9,8 +9,8 @@ use std::time::Instant;
 /// A Python module implemented in Rust.
 #[pymodule]
 fn fenwick_tree(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<FenwickTree>()?;
-    m.add_class::<NdFenwick>()?;
+    m.add_class::<BIT>()?;
+    m.add_class::<NdBIT>()?;
     Ok(())
 }
 
@@ -30,13 +30,15 @@ fn index_check(index: i32, size: usize) {
 
 // Fenwick tree is represented using a Vector
 #[pyclass]
-struct FenwickTree {
+struct BIT {
+    #[pyo3(get)]
     tree: Vec<i32>,
+    #[pyo3(get)]
     size: i32
 }
 
 #[pymethods]
-impl FenwickTree {
+impl BIT {
     // Adds value to the current value at index (this is the update outlined by the geeksforgeeks article)
     fn update(&mut self, mut index: i32, value: i32) {
         // 1 indexed cause that just how it be
@@ -49,29 +51,14 @@ impl FenwickTree {
         }
     }
 
-    fn get_size(&self) -> i32 {
-        self.size
-    }
-
-    fn get_tree(&self) -> Vec<i32> {
-        self.tree.clone()
-    }
-
     // This function behaves more like what you would expect from an update function where it overides the value at index
     // And then propagates the change up the tree. NOTE: Be careful as this may result in negative values in the tree
     // so please exercise caution when using this
-    fn override_update(&mut self, mut index: i32, value: i32) {
-        
-        // 1 indexed cause that just how it be
-        index = index + 1;
-        index_check(index, self.tree.len());
-
+    fn override_update(&mut self, index: i32, value: i32) {
         let diff = value - self.tree[index as usize];
-
-        while index <= (self.tree.len()-1) as i32 {
-            self.tree[index as usize] += diff;
-            index += index & (-index);
-        }
+        
+        // Update the value at index
+        self.update(index, diff);
     }
 
     // Base constructor for the fenwick tree. Takes a vector of i32s and constructs the tree
@@ -80,12 +67,12 @@ impl FenwickTree {
         let size = input.len() as i32;
         let mut tree = vec![0; size as usize];
         tree.insert(0, -9999); // Placeholder value to make the tree 1 indexed
-        let mut fenwick_tree = FenwickTree { tree, size };
+        let mut bit = BIT { tree, size };
         for x in 0..size {
-            fenwick_tree.update(x, input[x as usize]);
+            bit.update(x, input[x as usize]);
         }           
 
-        return fenwick_tree;
+        return bit;
     }
     
     // Constructor for the fenwick tree that takes a file path and constructs the tree
@@ -100,11 +87,11 @@ impl FenwickTree {
     let size = input.len() as i32;
     let mut tree = vec![0; size as usize];
     tree.insert(0, -9999); // Placeholder value to make the tree 1 indexed
-    let mut fenwick_tree = FenwickTree { tree, size };
+    let mut bit = BIT { tree, size };
     for x in 0..size {
-        fenwick_tree.update(x, input[x as usize]);
+        bit.update(x, input[x as usize]);
     }
-    fenwick_tree
+    bit
     }
 
     fn sum(&self, mut index: i32) -> i32 {
@@ -132,7 +119,7 @@ impl FenwickTree {
     }
 
     // Returns a vector of indices that are used to calculate the sum of the elements in the range [0, index]
-    fn get_sum_indices(&self, mut index: i32) -> Vec<i32> {
+    fn sum_indices(&self, mut index: i32) -> Vec<i32> {
         // 1 indexed cause that just how it be
         index = index + 1;
         let mut indices = Vec::new();
@@ -146,9 +133,9 @@ impl FenwickTree {
     }
 
     // Returns a vector of indices that are used to calculate the sum of the elements in the range [left, right]
-    fn get_range_sum_indices(&self, left: i32, right: i32) -> Vec<i32> {
-        let mut left_indices = self.get_sum_indices(left - 1);
-        let mut right_indices = self.get_sum_indices(right);
+    fn range_sum_indices(&self, left: i32, right: i32) -> Vec<i32> {
+        let mut left_indices = self.sum_indices(left - 1);
+        let mut right_indices = self.sum_indices(right);
 
         left_indices.append(&mut right_indices);
         left_indices
@@ -166,48 +153,19 @@ impl FenwickTree {
 // dimensions is the number of dimensions of the tree
 // The size is a vector of the n-th dimension sizes
 #[pyclass]
-struct NdFenwick {
+struct NdBIT {
+    // Cannot define pyo3 getter due to conversion error need to manually define getter here
     tree: Array<i64, IxDyn>,
+    #[pyo3(get)]
     dim: i32,
+    #[pyo3(get)]
     size: i32
 }
 
-fn create_empty_bit<T: Clone + Default>(dim: i32, inp: Vec<T>) -> Vec<T> {
-    if dim == 1 {
-        return vec![T::default(); inp.len()];
-    }
-    let mut bit = Vec::new();
-    for _ in 0..inp.len() {
-        bit.push(create_empty_bit(dim - 1, inp.clone()));
-    }
-    bit.concat()
-}
-
-/*
-Python::with_gil(|py| {
-        if dim == 1 {
-            for i in 0..inp.len() {
-                let mut temp_pos = position.clone();
-                temp_pos.append(i.into_py(py)).unwrap();
-                let temp_pos_vec: Vec<i32> = temp_pos.iter().map(|x| x.extract::<i32>().unwrap()).collect();
-                self.Update(temp_pos_vec, inp.get_item(i).unwrap().extract::<i32>().unwrap());
-            }
-            return;
-        }
-    
-        for i in 0..inp.len() {
-            let mut temp_pos = position.clone();
-            temp_pos.append(i.into_py(py)).unwrap();
-            self.FillTree(inp.get_item(i).unwrap().downcast::<PyList>().unwrap().clone(), dim-1, temp_pos);
-        }
-        });
- */
-
- 
-
-
 /* 
-    NdFenwick Tree generalised functions. We want to use slices and other rust based functions to make the code more efficient but pyo3 requires extensions to these base structures so instead we define them here and call into them
+    NdFenwick Tree generalised functions. We want to use slices and other rust based functions
+    to make the code more efficient but pyo3 requires extensions to these base structures
+    so instead we define them here and call them from within the implementation block
 */
 fn wrapped_sum_query(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
     fn query_helper(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
@@ -227,7 +185,7 @@ fn wrapped_sum_query(position: &[i32], tree: &Array<i64, IxDyn>) -> i64 {
     query_helper(&position, &tree)
 }
 
-fn fill_tree(dim: i32, inp: ArrayView<i64, IxDyn>, position: &mut [i32], tree: &mut NdFenwick) {
+fn fill_tree(dim: i32, inp: ArrayView<i64, IxDyn>, position: &mut [i32], tree: &mut NdBIT) {
     let pos_index = position.len() - dim as usize;
 
     if dim == 1 {
@@ -265,7 +223,7 @@ fn update_helper(position: &[i32], val: i64, tree: &mut ArrayViewMut<i64, IxDyn>
 }
 
 #[pymethods]
-impl NdFenwick {
+impl NdBIT {
     // takes a python list as input and checks if its a i32 or a list    
     fn update(&mut self, position: Vec<i32>, val: i64) {
         // No need to create a new Vec - just pass the slice directly
@@ -281,7 +239,7 @@ impl NdFenwick {
         let tree: Array<i64, IxDyn> = Array::zeros(IxDyn(&inp.shape().iter().map(|x| *x+1 as usize).collect::<Vec<usize>>()));
         let size = inp.len() as i32;
         
-        let mut nd_fenwick = NdFenwick { tree, dim, size };
+        let mut nd_fenwick = NdBIT { tree, dim, size };
 
         let mut slice: Vec<i32> = vec![0; dim as usize];
 
@@ -290,11 +248,16 @@ impl NdFenwick {
         return nd_fenwick;
     }
 
+    #[getter]
     fn get_tree<'py>(&self, py: Python<'py>) -> Py<PyArray<i64, IxDyn>> {
         self.tree.clone().into_pyarray(py).unbind()
     }
     
-    fn sum_query(&self, position: Vec<i32>) -> i64 {
+    /*
+        Calculates the sum of the elements in the range [0, position]
+        position is a vector of the same length as the dimension of the tree
+     */
+    fn sum(&self, position: Vec<i32>) -> i64 {
         let position: Vec<i32> = position.iter().map(|x| x + 1).collect();
         wrapped_sum_query(&position, &self.tree)
     }
@@ -305,7 +268,7 @@ impl NdFenwick {
         The function returns None if the dimensions of the points do not match the dimensions of the tree
         Currently only supports 1D and 2D trees for all other dimensions it will return None
      */
-    fn range_sum_query(&self, start: Vec<i32>, end: Vec<i32>) -> Option<i64> {
+    fn range_sum(&self, start: Vec<i32>, end: Vec<i32>) -> Option<i64> {
         if start.len() != end.len() ||
            start.len() != self.dim as usize || 
            end.len() != self.dim as usize {
@@ -313,12 +276,12 @@ impl NdFenwick {
         }
 
         match self.dim {
-            1 => return Some(self.sum_query(end) - self.sum_query(start)),
+            1 => return Some(self.sum(end) - self.sum(start)),
             2 => {
-                let s1 = self.sum_query(end.clone());
-                let s2 = self.sum_query(vec![end[0], start[1]-1]);
-                let s3 = self.sum_query(vec![start[0]-1, end[1]]);
-                let s4 = self.sum_query(start.into_iter().map(|x| x-1).collect());
+                let s1 = self.sum(end.clone());
+                let s2 = self.sum(vec![end[0], start[1]-1]);
+                let s3 = self.sum(vec![start[0]-1, end[1]]);
+                let s4 = self.sum(start.into_iter().map(|x| x-1).collect());
                 
                 return Some(s1 - s2 - s3 + s4);
             },
@@ -326,13 +289,5 @@ impl NdFenwick {
                 return None;
             }
         }
-    }
-
-    fn get_size(&self) -> i32 {
-        self.size
-    }
-
-    fn get_dim(&self) -> i32 {
-        self.dim
     }
 }

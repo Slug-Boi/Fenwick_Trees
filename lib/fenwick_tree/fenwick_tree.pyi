@@ -1,12 +1,32 @@
-class NdFenwick:
+class BIT:
     """
-    A class representing a N-Dimensional Fenwick Tree.
+    A class representing a Binary Indexed Tree (Fenwick Tree).
+    The tree is 1 indexed and the input array is 0 indexed.
+
+    :param input: input array to build the tree
+    """ 
+    def __init__(self, input: list) -> BIT: ...
+
+    @classmethod
+    def update(self, position: int, val: int) -> None:
+        """
+        Updates the Fenwick Tree with a given value at a specified position.
+        position is 0 indexed.
+
+        :param position: index of the element to be updated
+        :param val: value to be added to the specified position
+        """
+
+
+class NdBIT:
+    """
+    A class representing a N-Dimensional BIT (Fenwick Tree).
     The tree is 1 indexed and the input array is 0 indexed.
 
     :param input: input array to build the tree
     :param dim: number of dimensions of the input array
     """
-    def __init__(self, input: list, dim: int) -> NdFenwick: ...
+    def __init__(self, input: list, dim: int) -> NdBIT: ...
 
     @classmethod
     def update(self, position: list[int], val: int) -> None:
@@ -18,9 +38,9 @@ class NdFenwick:
         :param val: value to be added to the specified position
         """
     @classmethod
-    def get_tree(self) -> list:
+    def tree(self) -> list:
         """
-        Returns the Fenwick Tree.
+        Returns the BIT tree.
         """
 
     @classmethod
