@@ -2,7 +2,7 @@
 .DS_Store
 media
 .vscode/
-*/target-rust-analyser
+target-rust-analyser/
 manim.cfg
 
 # Byte-compiled / optimized / DLL files
