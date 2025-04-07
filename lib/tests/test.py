@@ -3,6 +3,7 @@ import MatrixSummer as ms
 import time
 import numpy as np
 from fenwick_tree import NdFenwick as NDBit
+import fenwick_tree as fw
 import MatrixSum as old_ms
 import fenwick_tree
 
@@ -30,32 +31,35 @@ def print2DMatrix(matrix):
 # print("Linear: ", endLin - startLin)
 # print("Async: ", endAsync - startAsync)
 
-data = MatrixGenerator.create_random_ndmatrix((2000,2000), (0, 10))
+data = MatrixGenerator.create_random_ndmatrix((5000,5000), (0, 10))
 
 data = np.array(data, dtype=int)
 
+build_time = time.time()
 fenwick = NDBit(data, 2)
+build_time_end = time.time()
 
 fenwick_time = time.time()
-fen_result = fenwick.sum_query((1999, 1999))
+fen_result = fenwick.sum_query((4999, 4999))
 fenwick_time_end = time.time()
 
 print("Fenwick: ", fenwick_time_end - fenwick_time)
 print("result", fen_result)
+print("Build: ", build_time_end - build_time)
 
 linear_time = time.time()
-sm = ms.linear_matrix_sum(data, (0,0), (1999,1999))
+sm = ms.linear_matrix_sum(data, (0,0), (4999,4999))
 linear_time_end = time.time()
 
 print("Linear: ", linear_time_end - linear_time)
 print("result", sm)
 
 old_time = time.time()
-old_result = old_ms.NDSumArray(data, 2, [0,0], [1999,1999])
+old_result = old_ms.NDSumArray(data, 2, [0,0], [4999,4999])
 old_time_end = time.time()
 
-print("Old: ", old_time_end - old_time)
-print("result", old_result)
+# print("Old: ", old_time_end - old_time)
+# print("result", old_result)
 
 # startLin = time.time()
 # output_mat = MatrixGenerator.create_random_ndmatrix((2000,2000), (0, 10))
