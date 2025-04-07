@@ -321,6 +321,8 @@ class Test(Scene):
         ) # Clean up
         self.wait(1)
 
+        fenwick_tree.update(2, 3)
+
         """
         Range Query
         """
