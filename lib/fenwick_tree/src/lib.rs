@@ -1,10 +1,7 @@
-use pyo3::{prelude::*, types::{PyList, PyString}};
+use pyo3::prelude::*;
 use std::fs;
-use std::io::prelude::*;
-use rayon::{iter::Update, option, prelude::*, string};
-use ndarray::{Array, ArrayBase, ArrayD, ArrayView, ArrayViewD, ArrayViewMut, Dim, IxDyn, IxDynImpl, OwnedRepr};
-use numpy::{IntoPyArray, PyArray, PyArrayDyn, PyArrayMethods, PyReadonlyArrayDyn, ToPyArray};
-use std::time::Instant;
+use ndarray::{Array, ArrayView, ArrayViewMut, IxDyn};
+use numpy::{IntoPyArray, PyArray, PyReadonlyArrayDyn};
 
 /// A Python module implemented in Rust.
 #[pymodule]
