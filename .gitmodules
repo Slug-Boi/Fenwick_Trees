@@ -1,0 +1,3 @@
+[submodule "lib/binary-indexed-tree"]
+	path = lib/binary-indexed-tree
+	url = https://github.com/Slug-Boi/binary-indexed-tree.git
