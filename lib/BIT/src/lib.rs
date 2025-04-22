@@ -5,7 +5,7 @@ use numpy::{IntoPyArray, PyArray, PyReadonlyArrayDyn};
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn fenwick_tree(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn bit_ds(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<BIT>()?;
     m.add_class::<NdBIT>()?;
     Ok(())

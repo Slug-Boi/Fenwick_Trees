@@ -1,6 +1,6 @@
 import time
 import MatrixGenerator as mg
-import fenwick_tree
+import bit_ds as fenwick_tree
 import numpy as np
 # This file is used as a playground file to test the FenwickTree class it does not test the library 
 
