@@ -2,10 +2,10 @@ import MatrixGenerator
 import MatrixSummer as ms
 import time
 import numpy as np
-from fenwick_tree import NdFenwick as NDBit
-import fenwick_tree as fw
+from bit_ds import NdBIT as NDBit
+import bit_ds as fw
 import MatrixSum as old_ms
-import fenwick_tree
+import bit_ds
 
 def print2DMatrix(matrix):
     for row in matrix:
@@ -40,7 +40,7 @@ fenwick = NDBit(data, 2)
 build_time_end = time.time()
 
 fenwick_time = time.time()
-fen_result = fenwick.sum_query((4999, 4999))
+fen_result = fenwick.sum((4999, 4999))
 fenwick_time_end = time.time()
 
 print("Fenwick: ", fenwick_time_end - fenwick_time)
