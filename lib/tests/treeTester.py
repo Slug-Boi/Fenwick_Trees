@@ -2,7 +2,7 @@ import time
 import MatrixSummer as MatrixSum
 import MatrixGenerator as mg
 import numpy as np
-from fenwick_tree import NdFenwick as NDBit
+from bit_ds import NdBIT as NDBit
 from random import randint
 import argparse
 import json
@@ -55,7 +55,7 @@ def randomData(dim: tuple[int], num_test: int, random_range: tuple[int], verbose
         lin_times[test] = linearEnd - linearStart
         
         fenwickStart = current_milli_time()
-        treeResult = fenwick.sum_query(queryPosition)
+        treeResult = fenwick.sum(queryPosition)
         fenwickEnd = current_milli_time()
         tree_times[test] = fenwickEnd - fenwickStart
         
@@ -116,7 +116,7 @@ def twoDFenwickSums(testMatrix, queryAmount, MatrixDimensions: tuple[int], verbo
         linearEnd = current_milli_time()
         lin_times[i] = linearEnd - linearStart
         treeStart = current_milli_time()
-        treeResult = fenwick.sum_query(queryPosition)
+        treeResult = fenwick.sum(queryPosition)
         treeEnd = current_milli_time()
         tree_times[i] = treeEnd - treeStart
 
