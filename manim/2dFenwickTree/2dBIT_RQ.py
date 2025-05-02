@@ -2,7 +2,6 @@ from pathlib import Path
 from twoDBit import TwoDBIT
 from manim import *
 from box_tree import *                
-from fenwick_tree import FenwickTree
 from copy import deepcopy
 
 
@@ -72,7 +71,6 @@ class QueryUpdateTwoDBIT(Scene):
             # into the full animation (for some reason)
             Text(
                 "BIT Table",
-                weight=SEMIBOLD, 
                 font="DejaVu Sans Condensed", 
                 font_size=36
             )

@@ -1,7 +1,7 @@
 from manim import *
 from manim_dsa import Highlightable
 from math import log2
-from fenwick_tree import FenwickTree
+from bit_ds import BIT as FenwickTree
 from typing import override
 
 class TreeElement(VGroup, Highlightable):
@@ -81,7 +81,7 @@ class BoxTree(VGroup):
                 TreeElement(Rectangle(
                     **tempStyle
                     ), 
-                    Text(str(tree.get_tree()[i+1]), **self.style["value"], fill_opacity=1 if self.show_values else 0)
+                    Text(str(tree.tree[i+1]), **self.style["value"], fill_opacity=1 if self.show_values else 0)
                     .scale(self.style["value_scale"])
                 )
                 .move_to(self[i][0].get_right(), RIGHT)
