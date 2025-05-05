@@ -6,7 +6,7 @@ from copy import copy
 global_font = "DejaVu Sans Condensed"
 arr = [3, 2, -3, 6, 5, 4, -2, 7]
 
-class FenwickTree_Tree(Scene):
+class Heap(Scene):
     @staticmethod
     def getLevel(index):
         return floor(log2(index + 1))
