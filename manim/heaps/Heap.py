@@ -75,14 +75,13 @@ class FenwickTree_Tree(Scene):
         self.play(Write(heapArrayText), run_time=0.7)
 
         insertText = Text(
-            "Insert(1)"
+            "Push(1)"
         ).move_to(heapArrayText.get_bottom(),UP).scale(0.5).align_to(heapArrayText.get_left(), LEFT)
         self.play(Write(insertText), run_time=0.7)
 
         self.play(
             graph.animate.add_node(
                 "1",
-                # ORIGIN
                 node_positions["6"] + DOWN * DOWNLEVEL + RIGHT * ((SIDELEVEL / 3) * 1.5)
             ),
             run_time = 0.7
@@ -95,20 +94,20 @@ class FenwickTree_Tree(Scene):
             run_time = 0.7
         )
         self.wait(0.5)
-        Text.become(graph[str(6)].submobjects[1], Text("1", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(6)].submobjects[1].get_bottom(), DOWN))
-        Text.become(graph[str(1)].submobjects[1], Text("6", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(1)].submobjects[1].get_bottom(), DOWN))
+        Text.become(graph[str(6)].submobjects[1], Text("1", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(6)].submobjects[0]))
+        Text.become(graph[str(1)].submobjects[1], Text("6", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(1)].submobjects[0]))
         self.play(Write(graph[str(6)].submobjects[1]), Write(graph[str(1)].submobjects[1]))
         
         self.wait(0.7)
-        Text.become(graph[str(2)].submobjects[1], Text("1", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(2)].submobjects[1].get_bottom(), DOWN))
-        Text.become(graph[str(6)].submobjects[1], Text("2", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(6)].submobjects[1].get_bottom(), DOWN))
+        Text.become(graph[str(2)].submobjects[1], Text("1", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(2)].submobjects[0]))
+        Text.become(graph[str(6)].submobjects[1], Text("2", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(6)].submobjects[0]))
         self.play(Write(graph[str(6)].submobjects[1]), Write(graph[str(2)].submobjects[1]))
         self.wait(0.2)
         
         self.play(FadeOut(heapArrayText), run_time=0.7)
         heapArrayText.become(
             Text(
-                "Heap: [" + ", ".join(list(map(str, copy((lambda: heapify((lambda: arr.append(1) or arr)()) or arr)())))) + "]"
+                "Heap: [" + ", ".join(list(map(str, copy((lambda: heappush(arr, 1) or arr)())))) + "]"
             ).scale(0.5).move_to(heapArrayText.get_left(), LEFT)
         )
         self.play(FadeIn(heapArrayText), run_time=0.7)
@@ -121,25 +120,42 @@ class FenwickTree_Tree(Scene):
         Remove animation
         """
         removeText = Text(
-            "Remove(-2)"
+            "Pop()"
         ).move_to(heapArrayText.get_bottom(),UP).scale(0.5).align_to(heapArrayText.get_left(), LEFT)
         self.play(Write(removeText), run_time=0.7)
         self.wait(0.7)
 
-        self.play(Unwrite(graph[str(-2)].submobjects[1]))
+        self.play(Unwrite(graph[str(-3)].submobjects[1])) # Remove root
         self.wait(0.5)
 
-        self.play(Unwrite(graph[str(1)].submobjects[1]), Uncreate(graph[str(1)]), FadeOut(graph.edges[("6", "1")]))
+        self.play(Unwrite(graph[str(1)].submobjects[1]), Uncreate(graph[str(1)]), FadeOut(graph.edges[("6", "1")])) # Remove last leaf
         self.wait(0.5)
-
-        Text.become(graph[str(-2)].submobjects[1], Text("6", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(-2)].submobjects[1].get_bottom(), DOWN))
-        self.play(Write(graph[str(-2)].submobjects[1]))
+        
+        # Make last leaf the root
+        Text.become(graph[str(-3)].submobjects[1], Text("6", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(-3)].submobjects[0]))
+        self.play(Write(graph[str(-3)].submobjects[1]))
         self.wait(0.7)
         
-        Text.become(graph[str(-2)].submobjects[1], Text("3", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(-2)].submobjects[1].get_bottom(), DOWN))
-        Text.become(graph[str(3)].submobjects[1], Text("6", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(3)].submobjects[1].get_bottom(), DOWN))
+        # Swap root and smallest child
+        Text.become(graph[str(-2)].submobjects[1], Text("6", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(-2)].submobjects[0]))
+        Text.become(graph[str(-3)].submobjects[1], Text("-2", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(-3)].submobjects[0]))
+        self.play(Write(graph[str(-2)].submobjects[1]), Write(graph[str(-3)].submobjects[1]))
+        self.wait(0.7)
+		
+        # Swap the former root and smallest child
+        Text.become(graph[str(-2)].submobjects[1], Text("3", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(-2)].submobjects[0]))
+        Text.become(graph[str(3)].submobjects[1], Text("6", **MGraphStyle.DEFAULT.node_label).move_to(graph[str(3)].submobjects[0]))
         self.play(Write(graph[str(-2)].submobjects[1]), Write(graph[str(3)].submobjects[1]))
-        
+        self.wait(0.5)
+
+        self.play(FadeOut(heapArrayText), run_time=0.7)
+        heappop(arr)
+        heapArrayText.become(
+            Text(
+				"Heap: [" + ", ".join(list(map(str, copy(arr)))) + "]"
+			).scale(0.5).move_to(heapArrayText.get_left(), LEFT)
+		)
+        self.play(FadeIn(heapArrayText), run_time=0.7)
         self.wait(0.7)
 
         self.play(FadeOut(removeText), run_time=0.7)
