@@ -2,7 +2,7 @@ from manim import *
 from manim_dsa import *
 from manim_dsa.m_graph_generic.m_graph_generic import MGraphGeneric
 from math import log2, ceil
-from fenwick_tree import FenwickTree
+from bit_ds import BIT as FenwickTree
 from copy import deepcopy
 
 global_font = "DejaVu Sans Condensed"
@@ -42,7 +42,7 @@ class FenwickTree_Tree(Scene):
         fw = FenwickTree(arr)
         
         # Fenwick Tree Array
-        fta = fw.get_tree()
+        fta = fw.tree
         print(fta)
     
         dsa_arr = MArray(arr, margin=1.25, style=MArrayStyle.BLUE).scale(0.75).to_edge(DOWN).shift(UP*0.3)
@@ -311,7 +311,7 @@ class FenwickTree_Tree(Scene):
             # Highlight and change text in tree
             highlights.append(updateIndex)
             self.play(mgraph[str(updateIndex)].animate.highlight(PINK))
-            Text.become(mgraph[str(updateIndex)].submobjects[1], Text(str(fw.get_tree()[updateIndex]), **style.node_label).scale(0.75).move_to(mgraph[str(updateIndex)].submobjects[1]))
+            Text.become(mgraph[str(updateIndex)].submobjects[1], Text(str(fw.tree[updateIndex]), **style.node_label).scale(0.75).move_to(mgraph[str(updateIndex)].submobjects[1]))
             self.play(Write(mgraph[str(updateIndex)].submobjects[1]))
             
             # Prep for next loop

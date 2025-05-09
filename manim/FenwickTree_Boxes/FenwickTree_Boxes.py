@@ -1,6 +1,6 @@
 from manim import *
 from manim_dsa import *
-from fenwick_tree import FenwickTree
+from bit_ds import BIT as FenwickTree
 
 
 def plus_sign(boxnum, boxes):
@@ -51,7 +51,7 @@ class Test(Scene):
     def construct(self):
         array = [4,8,5,2,6,1,0,8]
         fenwick_tree = FenwickTree(array)
-        fenwick_tree_arr = fenwick_tree.get_tree()
+        fenwick_tree_arr = fenwick_tree.tree
         UPLEVEL = 1.3
         startArray = (
             MArray(array, style=MArrayStyle.BLUE)
