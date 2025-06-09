@@ -384,7 +384,7 @@ class Test(Scene):
 
         # Start query
         startQueryText = (
-            Text(f"Query: Sum({startRange})")
+            Text(f"Query: Sum({startRange-1})")
             .scale(0.6)
             .move_to(endQueryText.get_left(), LEFT)
             .shift(DOWN*0.5)
