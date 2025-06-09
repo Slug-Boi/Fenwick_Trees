@@ -52,6 +52,7 @@ class Test(Scene):
         array = [4,8,5,2,6,1,0,8]
         fenwick_tree = FenwickTree(array)
         fenwick_tree_arr = fenwick_tree.tree
+
         UPLEVEL = 1.3
         startArray = (
             MArray(array, style=MArrayStyle.BLUE)
@@ -170,7 +171,7 @@ class Test(Scene):
 
         self.moveNumBox(boxes[5], UP, UPLEVEL, index_group[5])
         
-        sumText = Text(str(fenwick_tree.range_sum(4,5)), stroke_width=3).move_to(sumBox3.get_center())
+        sumText = Text(str(fenwick_tree_arr[6]), stroke_width=3).move_to(sumBox3.get_center())
         self.play(
             Transform(boxes[5][0], sumBox3),
             FadeTransform(boxes[5][1], sumText, stretch=False),
@@ -391,7 +392,7 @@ class Test(Scene):
         self.play(Write(startQueryText))
 
         highlight_indices = []
-        z = startRange + 1
+        z = startRange
         while z > 0:
             highlight_indices.append(z)
             z -= -z & z
@@ -408,7 +409,7 @@ class Test(Scene):
         )
 
         startResultText = (
-            Text(f"{fenwick_tree.sum(startRange)}")
+            Text(f"{fenwick_tree.sum(startRange-1)}")
             .scale(0.6)
             .move_to(startResultEqual.get_right(), LEFT)
             .shift(RIGHT*0.2)
@@ -454,7 +455,7 @@ class Test(Scene):
         )
 
         sumText = (
-            Text(str(fenwick_tree.sum(endRange) - fenwick_tree.sum(startRange)))
+            Text(str(fenwick_tree.sum(endRange) - fenwick_tree.sum(startRange-1)))
             .scale(0.6)
             .move_to(startResultText.get_right(), RIGHT)
             .shift(DOWN*0.6)
@@ -464,7 +465,7 @@ class Test(Scene):
 
         # Final result
         rangeResultText = (
-            Text(f"= {fenwick_tree.sum(endRange) - fenwick_tree.sum(startRange)}")
+            Text(f"= {fenwick_tree.sum(endRange) - fenwick_tree.sum(startRange-1)}")
             .scale(0.75)
             .move_to(rangeText.get_right(), LEFT)
             .shift(RIGHT*0.28+UP*0.04)
